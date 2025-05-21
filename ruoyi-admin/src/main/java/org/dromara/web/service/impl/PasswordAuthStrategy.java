@@ -59,9 +59,9 @@ public class PasswordAuthStrategy implements IAuthStrategy {
 
         boolean captchaEnabled = captchaProperties.getEnable();
         // 验证码开关
-        if (captchaEnabled) {
-            validateCaptcha(tenantId, username, code, uuid);
-        }
+//        if (captchaEnabled) {
+//            validateCaptcha(tenantId, username, code, uuid);
+//        }
         LoginUser loginUser = TenantHelper.dynamic(tenantId, () -> {
             SysUserVo user = loadUserByUsername(username);
             loginService.checkLogin(LoginType.PASSWORD, tenantId, username, () -> !BCrypt.checkpw(password, user.getPassword()));

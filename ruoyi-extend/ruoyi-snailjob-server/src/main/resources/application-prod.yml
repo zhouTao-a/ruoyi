@@ -30,7 +30,7 @@ snail-job:
 spring.boot.admin.client:
   # 增加客户端开关
   enabled: true
-  url: http://localhost:9090/admin
+  url: http://180.76.114.136:9090/admin
   instance:
     service-host-type: IP
     metadata:
