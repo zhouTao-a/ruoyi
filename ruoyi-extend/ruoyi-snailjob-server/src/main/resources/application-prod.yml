@@ -2,7 +2,7 @@ spring:
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://180.76.114.136:3306/ruoyi?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://192.168.16.2:3306/ruoyi?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
     username: root
     password: zh@123.zh
     hikari:
@@ -30,7 +30,7 @@ snail-job:
 spring.boot.admin.client:
   # 增加客户端开关
   enabled: true
-  url: http://180.76.114.136:9090/admin
+  url: http://localhost:9090/admin
   instance:
     service-host-type: IP
     metadata:

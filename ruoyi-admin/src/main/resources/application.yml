@@ -176,7 +176,7 @@ api-decrypt:
 springdoc:
   api-docs:
     # 是否开启接口文档
-    enabled: false
+    enabled: true
 #  swagger-ui:
 #    # 持久化认证数据
 #    persistAuthorization: true
@@ -257,7 +257,7 @@ sse:
 --- # websocket
 websocket:
   # 如果关闭 需要和前端开关一起关闭
-  enabled: false
+  enabled: true
   # 路径
   path: /resource/websocket
   # 设置访问源地址
@@ -266,7 +266,7 @@ websocket:
 --- # warm-flow工作流配置
 warm-flow:
   # 是否开启工作流，默认true
-  enabled: false
+  enabled: true
   # 是否开启设计器ui
   ui: true
   # 默认Authorization，如果有多个token，用逗号分隔
