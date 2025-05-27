@@ -239,3 +239,32 @@ justauth:
       client-id: 10**********6
       client-secret: 1f7d08**********5b7**********29e
       redirect-uri: ${justauth.address}/social-callback?source=gitlab
+
+
+logging:
+  level:
+    # 根日志设置为 WARN，避免 debug 和 info 过多输出
+    root: warn
+
+    # 打印 SQL 日志（MyBatis / MyBatis-Plus）
+    com.baomidou.mybatisplus: info
+    org.apache.ibatis: debug
+    org.mybatis: debug
+
+    # 打印 Hikari 连接池初始化信息
+    com.zaxxer.hikari: info
+
+    # 你的业务包日志（可选 info）
+    com.yourcompany: info
+
+    # 打印异常栈
+    org.springframework: error
+    org.springframework.boot: error
+    org.springframework.web: error
+
+    # Redisson 错误日志（如有用到）
+    org.redisson: error
+
+  # 控制台输出格式（可选）
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n"
