@@ -35,6 +35,7 @@ import org.dromara.system.service.ISysClientService;
 import org.dromara.system.service.ISysConfigService;
 import org.dromara.system.service.ISysSocialService;
 import org.dromara.system.service.ISysTenantService;
+import org.dromara.web.annotation.CheckIpWhiteList;
 import org.dromara.web.domain.vo.LoginTenantVo;
 import org.dromara.web.domain.vo.LoginVo;
 import org.dromara.web.domain.vo.TenantListVo;
@@ -82,6 +83,7 @@ public class AuthController {
      */
     @ApiEncrypt
     @PostMapping("/login")
+    @CheckIpWhiteList
     public R<LoginVo> login(@RequestBody String body) {
         LoginBody loginBody = JsonUtils.parseObject(body, LoginBody.class);
         ValidatorUtils.validate(loginBody);
