@@ -102,6 +102,7 @@ public class MsgUserServiceImpl implements IMsgUserService {
      */
     @Override
     public Boolean updateByBo(MsgUserBo bo) {
+        //TODO 修改时设置为空不生效
         MsgUser update = MapstructUtils.convert(bo, MsgUser.class);
         validEntityBeforeSave(update);
         return baseMapper.updateById(update) > 0;

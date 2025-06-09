@@ -58,11 +58,13 @@ public class MsgUserBo extends BaseEntity {
     /**
      * 出生日期
      */
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date birthday;
 
     /**
      * 农历出生日期
      */
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date lunarBirthday;
 
     /**
