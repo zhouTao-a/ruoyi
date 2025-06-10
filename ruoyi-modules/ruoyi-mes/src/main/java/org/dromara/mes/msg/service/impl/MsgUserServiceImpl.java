@@ -1,5 +1,6 @@
 package org.dromara.mes.msg.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
@@ -102,10 +103,19 @@ public class MsgUserServiceImpl implements IMsgUserService {
      */
     @Override
     public Boolean updateByBo(MsgUserBo bo) {
-        //TODO 修改时设置为空不生效
-        MsgUser update = MapstructUtils.convert(bo, MsgUser.class);
-        validEntityBeforeSave(update);
-        return baseMapper.updateById(update) > 0;
+        UpdateWrapper<MsgUser> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.eq("id", bo.getId())
+            .set("birthday", bo.getBirthday())
+            .set("email", bo.getEmail())
+            .set("email_notify_flag", bo.getEmailNotifyFlag())
+            .set("gender", bo.getGender())
+            .set("id_card", bo.getIdCard())
+            .set("lunar_birthday", bo.getLunarBirthday())
+            .set("phone_number", bo.getPhoneNumber())
+            .set("sms_notify_flag", bo.getSmsNotifyFlag())
+            .set("user_code", bo.getUserCode())
+            .set("user_name", bo.getUserName());
+        return baseMapper.update(null, updateWrapper) > 0;
     }
 
     /**
