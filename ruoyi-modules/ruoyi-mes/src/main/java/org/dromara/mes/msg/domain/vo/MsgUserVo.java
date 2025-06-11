@@ -1,7 +1,9 @@
 package org.dromara.mes.msg.domain.vo;
 
 import java.util.Date;
-import com.fasterxml.jackson.annotation.JsonFormat;
+
+import org.dromara.common.sensitive.annotation.Sensitive;
+import org.dromara.common.sensitive.core.SensitiveStrategy;
 import org.dromara.mes.msg.domain.MsgUser;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
@@ -12,7 +14,6 @@ import lombok.Data;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Date;
 
 
 
@@ -59,12 +60,14 @@ public class MsgUserVo implements Serializable {
      * 身份证号
      */
     @ExcelProperty(value = "身份证号")
+    @Sensitive(strategy = SensitiveStrategy.ID_CARD)
     private String idCard;
 
     /**
      * 手机号
      */
     @ExcelProperty(value = "手机号")
+    @Sensitive(strategy = SensitiveStrategy.PHONE)
     private String phoneNumber;
 
     /**

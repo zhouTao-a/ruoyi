@@ -16,6 +16,7 @@ import org.dromara.mes.msg.domain.MsgUser;
 import org.dromara.mes.msg.mapper.MsgUserMapper;
 import org.dromara.mes.msg.service.IMsgUserService;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Collection;
@@ -72,9 +73,9 @@ public class MsgUserServiceImpl implements IMsgUserService {
     private LambdaQueryWrapper<MsgUser> buildQueryWrapper(MsgUserBo bo) {
         Map<String, Object> params = bo.getParams();
         LambdaQueryWrapper<MsgUser> lqw = Wrappers.lambdaQuery();
-        lqw.orderByAsc(MsgUser::getId);
+        lqw.orderByDesc(MsgUser::getUpdateTime);
         lqw.like(StringUtils.isNotBlank(bo.getUserName()), MsgUser::getUserName, bo.getUserName());
-        lqw.eq(StringUtils.isNotBlank(bo.getPhoneNumber()), MsgUser::getPhoneNumber, bo.getPhoneNumber());
+        lqw.like(StringUtils.isNotBlank(bo.getPhoneNumber()), MsgUser::getPhoneNumber, bo.getPhoneNumber());
         return lqw;
     }
 
@@ -114,7 +115,8 @@ public class MsgUserServiceImpl implements IMsgUserService {
             .set("phone_number", bo.getPhoneNumber())
             .set("sms_notify_flag", bo.getSmsNotifyFlag())
             .set("user_code", bo.getUserCode())
-            .set("user_name", bo.getUserName());
+            .set("user_name", bo.getUserName())
+            .set("update_time", new Date());
         return baseMapper.update(null, updateWrapper) > 0;
     }
 
