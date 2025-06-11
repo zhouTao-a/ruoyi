@@ -1,0 +1,103 @@
+package org.dromara.mes.msg.domain.vo;
+
+import java.util.Date;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import org.dromara.mes.msg.domain.MsgUser;
+import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
+import com.alibaba.excel.annotation.ExcelProperty;
+import org.dromara.common.excel.annotation.ExcelDictFormat;
+import org.dromara.common.excel.convert.ExcelDictConvert;
+import io.github.linpeilie.annotations.AutoMapper;
+import lombok.Data;
+
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.Date;
+
+
+
+/**
+ * 用户视图对象 mes_msg_user
+ *
+ * @author zhout
+ * @date 2025-06-08
+ */
+@Data
+@ExcelIgnoreUnannotated
+@AutoMapper(target = MsgUser.class)
+public class MsgUserVo implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * 主键ID
+     */
+    @ExcelProperty(value = "主键ID")
+    private Long id;
+
+    /**
+     * 用户名
+     */
+    @ExcelProperty(value = "用户名")
+    private String userName;
+
+    /**
+     * 性别
+     */
+    @ExcelProperty(value = "性别", converter = ExcelDictConvert.class)
+    @ExcelDictFormat(dictType = "sys_user_sex")
+    private String gender;
+
+    /**
+     * 用户编码
+     */
+    @ExcelProperty(value = "用户编码")
+    private String userCode;
+
+    /**
+     * 身份证号
+     */
+    @ExcelProperty(value = "身份证号")
+    private String idCard;
+
+    /**
+     * 手机号
+     */
+    @ExcelProperty(value = "手机号")
+    private String phoneNumber;
+
+    /**
+     * 出生日期
+     */
+    @ExcelProperty(value = "出生日期")
+    private Date birthday;
+
+    /**
+     * 农历出生日期
+     */
+    @ExcelProperty(value = "农历出生日期")
+    private Date lunarBirthday;
+
+    /**
+     * 邮箱地址
+     */
+    @ExcelProperty(value = "邮箱地址")
+    private String email;
+
+    /**
+     * 是否接收短信通知（T/F）
+     */
+    @ExcelProperty(value = "是否接收短信通知", converter = ExcelDictConvert.class)
+    @ExcelDictFormat(readConverterExp = "T=/F")
+    private String smsNotifyFlag;
+
+    /**
+     * 是否接收邮箱通知（T/F）
+     */
+    @ExcelProperty(value = "是否接收邮箱通知", converter = ExcelDictConvert.class)
+    @ExcelDictFormat(readConverterExp = "T=/F")
+    private String emailNotifyFlag;
+
+
+}
