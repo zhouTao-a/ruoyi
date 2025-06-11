@@ -71,7 +71,6 @@ public class MsgUserServiceImpl implements IMsgUserService {
     }
 
     private LambdaQueryWrapper<MsgUser> buildQueryWrapper(MsgUserBo bo) {
-        Map<String, Object> params = bo.getParams();
         LambdaQueryWrapper<MsgUser> lqw = Wrappers.lambdaQuery();
         lqw.orderByDesc(MsgUser::getUpdateTime);
         lqw.like(StringUtils.isNotBlank(bo.getUserName()), MsgUser::getUserName, bo.getUserName());

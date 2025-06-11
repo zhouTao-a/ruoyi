@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.*;
 import cn.dev33.satoken.annotation.SaCheckPermission;
+import org.dromara.mes.utils.SensitiveDataUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.validation.annotation.Validated;
 import org.dromara.common.idempotent.annotation.RepeatSubmit;
@@ -53,7 +54,8 @@ public class MsgUserController extends BaseController {
     @PostMapping("/export")
     public void export(MsgUserBo bo, HttpServletResponse response) {
         List<MsgUserVo> list = msgUserService.queryList(bo);
-        ExcelUtil.exportExcel(list, "用户", MsgUserVo.class, response);
+        List<MsgUserVo> handle = SensitiveDataUtils.handle(list);
+        ExcelUtil.exportExcel(handle, "用户", MsgUserVo.class, response);
     }
 
     /**
