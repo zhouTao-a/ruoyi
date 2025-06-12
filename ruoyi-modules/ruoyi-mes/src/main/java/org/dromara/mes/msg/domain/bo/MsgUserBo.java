@@ -73,12 +73,12 @@ public class MsgUserBo extends BaseEntity {
     private String email;
 
     /**
-     * 是否接收短信通知（T/F）
+     * 短信通知
      */
     private String smsNotifyFlag;
 
     /**
-     * 是否接收邮箱通知（T/F）
+     * 邮箱通知
      */
     private String emailNotifyFlag;
 

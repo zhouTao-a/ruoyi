@@ -1,4 +1,4 @@
-package org.dromara.mes.system.util;
+package org.dromara.mes.system.utils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.dromara.common.core.utils.StringUtils;

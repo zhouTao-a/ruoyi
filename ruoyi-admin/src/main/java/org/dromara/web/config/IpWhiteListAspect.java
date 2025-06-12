@@ -10,7 +10,7 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.dromara.common.redis.utils.RedisUtils;
 import org.dromara.mes.system.domain.IpWhiteList;
 import org.dromara.mes.system.mapper.IpWhiteListMapper;
-import org.dromara.mes.system.util.IpUtils;
+import org.dromara.mes.system.utils.IpUtils;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;

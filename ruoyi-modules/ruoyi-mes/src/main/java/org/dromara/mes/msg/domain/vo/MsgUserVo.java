@@ -34,7 +34,6 @@ public class MsgUserVo implements Serializable {
     /**
      * 主键ID
      */
-    @ExcelProperty(value = "主键ID")
     private Long id;
 
     /**
@@ -89,17 +88,17 @@ public class MsgUserVo implements Serializable {
     private String email;
 
     /**
-     * 是否接收短信通知（T/F）
+     * 短信通知
      */
-    @ExcelProperty(value = "是否接收短信通知", converter = ExcelDictConvert.class)
-    @ExcelDictFormat(readConverterExp = "T=/F")
+    @ExcelProperty(value = "短信通知", converter = ExcelDictConvert.class)
+    @ExcelDictFormat(dictType = "whether_flag")
     private String smsNotifyFlag;
 
     /**
-     * 是否接收邮箱通知（T/F）
+     * 邮箱通知
      */
-    @ExcelProperty(value = "是否接收邮箱通知", converter = ExcelDictConvert.class)
-    @ExcelDictFormat(readConverterExp = "T=/F")
+    @ExcelProperty(value = "邮箱通知", converter = ExcelDictConvert.class)
+    @ExcelDictFormat(dictType = "whether_flag")
     private String emailNotifyFlag;
 
 

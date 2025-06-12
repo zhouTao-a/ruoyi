@@ -8,6 +8,7 @@ import java.util.*;
 import java.util.function.Function;
 
 /**
+ * 这样会忽略权限
  * 通用的脱敏工具类，用于处理标注了 @Sensitive 注解的字段
  */
 public class SensitiveDataUtils {
