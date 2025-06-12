@@ -1,13 +1,13 @@
 package org.dromara.mes.msg.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.dromara.mes.msg.domain.bo.MsgUserBo;
@@ -103,19 +103,19 @@ public class MsgUserServiceImpl implements IMsgUserService {
      */
     @Override
     public Boolean updateByBo(MsgUserBo bo) {
-        UpdateWrapper<MsgUser> updateWrapper = new UpdateWrapper<>();
-        updateWrapper.eq("id", bo.getId())
-            .set("birthday", bo.getBirthday())
-            .set("email", bo.getEmail())
-            .set("email_notify_flag", bo.getEmailNotifyFlag())
-            .set("gender", bo.getGender())
-            .set("id_card", bo.getIdCard())
-            .set("lunar_birthday", bo.getLunarBirthday())
-            .set("phone_number", bo.getPhoneNumber())
-            .set("sms_notify_flag", bo.getSmsNotifyFlag())
-            .set("user_code", bo.getUserCode())
-            .set("user_name", bo.getUserName())
-            .set("update_time", new Date());
+        LambdaUpdateWrapper<MsgUser> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.eq(MsgUser::getId, bo.getId())
+            .set(MsgUser::getBirthday, bo.getBirthday())
+            .set(MsgUser::getEmail, bo.getEmail())
+            .set(MsgUser::getEmailNotifyFlag, bo.getEmailNotifyFlag())
+            .set(MsgUser::getGender, bo.getGender())
+            .set(MsgUser::getIdCard, bo.getIdCard())
+            .set(MsgUser::getLunarBirthday, bo.getLunarBirthday())
+            .set(MsgUser::getPhoneNumber, bo.getPhoneNumber())
+            .set(MsgUser::getSmsNotifyFlag, bo.getSmsNotifyFlag())
+            .set(MsgUser::getUserCode, bo.getUserCode())
+            .set(MsgUser::getUserName, bo.getUserName())
+            .set(MsgUser::getUpdateTime, new Date());
         return baseMapper.update(null, updateWrapper) > 0;
     }
 
