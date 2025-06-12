@@ -38,8 +38,9 @@ public class MsgDayMatterUser extends TenantEntity {
     private Long userId;
 
     /**
-     * 逻辑删除标志（T/F）
+     * 逻辑删除标志
      */
+    @TableLogic
     private String deletedFlag;
 
 

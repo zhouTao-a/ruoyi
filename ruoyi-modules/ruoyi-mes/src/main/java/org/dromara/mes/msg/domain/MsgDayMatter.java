@@ -75,8 +75,9 @@ public class MsgDayMatter extends TenantEntity {
     private Long groupId;
 
     /**
-     * 逻辑删除标志（T/F）
+     * 逻辑删除标志
      */
+    @TableLogic
     private String deletedFlag;
 
 
