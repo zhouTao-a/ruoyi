@@ -4,4 +4,17 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.dromara.mes.msg.mapper.MsgUserMapper">
 
+
+    <select id="queryUserCodePageList" resultType="org.dromara.mes.msg.domain.vo.MsgUserCodeVo">
+        select id, user_name, user_code
+        from mes_msg_user
+        <where>
+            <if test="param.userName != null and param.userName != ''">
+                and user_name like concat('%', #{param.userName}, '%')
+            </if>
+            <if test="param.userCode != null and param.userCode != ''">
+                and user_code like concat('%', #{param.userCode}, '%')
+            </if>
+        </where>
+    </select>
 </mapper>

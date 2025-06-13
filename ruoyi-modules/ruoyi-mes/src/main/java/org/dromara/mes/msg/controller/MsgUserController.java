@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.*;
 import cn.dev33.satoken.annotation.SaCheckPermission;
+import org.dromara.mes.msg.domain.vo.MsgUserCodeVo;
 import org.dromara.mes.utils.SensitiveDataUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.validation.annotation.Validated;
@@ -44,6 +45,15 @@ public class MsgUserController extends BaseController {
     @GetMapping("/list")
     public TableDataInfo<MsgUserVo> list(MsgUserBo bo, PageQuery pageQuery) {
         return msgUserService.queryPageList(bo, pageQuery);
+    }
+
+    /**
+     * 查询用户列表
+     */
+    @SaCheckPermission("msg:msgUser:list")
+    @GetMapping("/userCodeList")
+    public TableDataInfo<MsgUserCodeVo> userCodeList(MsgUserBo bo, PageQuery pageQuery) {
+        return msgUserService.queryUserCodePageList(bo, pageQuery);
     }
 
     /**

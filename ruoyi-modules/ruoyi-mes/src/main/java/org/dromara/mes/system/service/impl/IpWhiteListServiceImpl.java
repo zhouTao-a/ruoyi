@@ -69,9 +69,8 @@ public class IpWhiteListServiceImpl implements IIpWhiteListService {
     }
 
     private LambdaQueryWrapper<IpWhiteList> buildQueryWrapper(IpWhiteListBo bo) {
-        Map<String, Object> params = bo.getParams();
         LambdaQueryWrapper<IpWhiteList> lqw = Wrappers.lambdaQuery();
-        lqw.orderByAsc(IpWhiteList::getId);
+        lqw.orderByDesc(IpWhiteList::getUpdateTime);
         lqw.eq(StringUtils.isNotBlank(bo.getIpAddress()), IpWhiteList::getIpAddress, bo.getIpAddress());
         lqw.eq(StringUtils.isNotBlank(bo.getDescription()), IpWhiteList::getDescription, bo.getDescription());
         lqw.eq(bo.getStatus() != null, IpWhiteList::getStatus, bo.getStatus());

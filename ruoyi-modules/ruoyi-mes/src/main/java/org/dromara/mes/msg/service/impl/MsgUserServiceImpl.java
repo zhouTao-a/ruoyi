@@ -2,6 +2,7 @@ package org.dromara.mes.msg.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
@@ -9,6 +10,7 @@ import org.dromara.common.mybatis.core.page.PageQuery;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
+import org.dromara.mes.msg.domain.vo.MsgUserCodeVo;
 import org.springframework.stereotype.Service;
 import org.dromara.mes.msg.domain.bo.MsgUserBo;
 import org.dromara.mes.msg.domain.vo.MsgUserVo;
@@ -16,10 +18,7 @@ import org.dromara.mes.msg.domain.MsgUser;
 import org.dromara.mes.msg.mapper.MsgUserMapper;
 import org.dromara.mes.msg.service.IMsgUserService;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Collection;
+import java.util.*;
 
 /**
  * 用户Service业务层处理
@@ -87,6 +86,7 @@ public class MsgUserServiceImpl implements IMsgUserService {
     @Override
     public Boolean insertByBo(MsgUserBo bo) {
         MsgUser add = MapstructUtils.convert(bo, MsgUser.class);
+        assert add != null;
         validEntityBeforeSave(add);
         boolean flag = baseMapper.insert(add) > 0;
         if (flag) {
@@ -104,6 +104,12 @@ public class MsgUserServiceImpl implements IMsgUserService {
     @Override
     public Boolean updateByBo(MsgUserBo bo) {
         LambdaUpdateWrapper<MsgUser> updateWrapper = new LambdaUpdateWrapper<>();
+        List<MsgUserVo> msgUserVos = baseMapper.selectVoList(Wrappers.<MsgUser>lambdaQuery()
+            .eq(MsgUser::getUserCode, bo.getUserCode())
+            .ne(MsgUser::getId, bo.getId()));
+        if (!msgUserVos.isEmpty()) {
+            throw new ServiceException("用户代码不能重复!");
+        }
         updateWrapper.eq(MsgUser::getId, bo.getId())
             .set(MsgUser::getBirthday, bo.getBirthday())
             .set(MsgUser::getEmail, bo.getEmail())
@@ -123,7 +129,11 @@ public class MsgUserServiceImpl implements IMsgUserService {
      * 保存前的数据校验
      */
     private void validEntityBeforeSave(MsgUser entity){
-        //TODO 做一些数据校验,如唯一约束
+        List<MsgUserVo> msgUserVos = baseMapper.selectVoList(Wrappers.<MsgUser>lambdaQuery()
+            .eq(MsgUser::getUserCode, entity.getUserCode()));
+        if (!msgUserVos.isEmpty()) {
+            throw new ServiceException("用户代码不能重复!");
+        }
     }
 
     /**
@@ -135,9 +145,12 @@ public class MsgUserServiceImpl implements IMsgUserService {
      */
     @Override
     public Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid) {
-        if(isValid){
-            //TODO 做一些业务上的校验,判断是否需要校验
-        }
         return baseMapper.deleteByIds(ids) > 0;
+    }
+
+    @Override
+    public TableDataInfo<MsgUserCodeVo> queryUserCodePageList(MsgUserBo bo, PageQuery pageQuery) {
+        Page<MsgUserCodeVo> result = baseMapper.queryUserCodePageList(pageQuery.build(), bo);
+        return TableDataInfo.build(result);
     }
 }

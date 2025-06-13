@@ -30,12 +30,14 @@ public class MsgGroupBo extends BaseEntity {
      * 分组名称
      */
     @NotBlank(message = "分组名称不能为空", groups = { AddGroup.class, EditGroup.class })
+    @Size(max = 20, message = "分组名称长度不能超过20个字符", groups = { AddGroup.class, EditGroup.class })
     private String groupName;
 
     /**
      * 分组编码
      */
     @NotBlank(message = "分组编码不能为空", groups = { AddGroup.class, EditGroup.class })
+    @Size(max = 20, message = "分组编码长度不能超过20个字符", groups = { AddGroup.class, EditGroup.class })
     private String groupCode;
 
     /**

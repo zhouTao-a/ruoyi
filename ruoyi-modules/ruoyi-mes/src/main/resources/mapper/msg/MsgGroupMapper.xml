@@ -4,4 +4,23 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.dromara.mes.msg.mapper.MsgGroupMapper">
 
+    <select id="queryPageList" resultType="org.dromara.mes.msg.domain.vo.MsgGroupVo">
+        select
+            g.id,
+        g.group_name,
+        g.group_code,
+        g.default_target_user_id,
+        u.user_code as default_target_user_code
+        from mes_msg_group g
+        inner join mes_msg_user u on g.default_target_user_id = u.id
+        <where>
+            <if test="param.groupName != null and param.groupName != ''">
+                and g.group_name like concat('%', #{param.groupName}, '%')
+            </if>
+            <if test="param.groupCode != null and param.groupCode != ''">
+                and g.group_code like concat('%', #{groupCode}, '%')
+            </if>
+        </where>
+        order by g.update_time desc
+    </select>
 </mapper>

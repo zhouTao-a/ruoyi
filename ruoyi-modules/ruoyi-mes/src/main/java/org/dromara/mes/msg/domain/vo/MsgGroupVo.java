@@ -31,7 +31,6 @@ public class MsgGroupVo implements Serializable {
     /**
      * 主键ID
      */
-    @ExcelProperty(value = "主键ID")
     private Long id;
 
     /**
@@ -49,8 +48,13 @@ public class MsgGroupVo implements Serializable {
     /**
      * 默认参考用户ID
      */
-    @ExcelProperty(value = "默认参考用户ID")
     private Long defaultTargetUserId;
+
+    /**
+     * 默认参考用户代码
+     */
+    @ExcelProperty(value = "参考用户代码")
+    private String defaultTargetUserCode;
 
 
 }

@@ -30,8 +30,8 @@ public class DateBaseController extends BaseController {
      * @return 公历日期
      */
     @GetMapping("getSolarDate")
-    public R<List<Date>> getSolarDate(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date date) {
-        return R.ok(LunarSolarUtils.lunarToSolar(date));
+    public R<Date> getSolarDate(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date date) {
+        return R.ok(LunarSolarUtils.lunarToSolar(date).get(0));
     }
 
     /**
