@@ -56,5 +56,11 @@ public class MsgGroupVo implements Serializable {
     @ExcelProperty(value = "参考用户代码")
     private String defaultTargetUserCode;
 
+    /**
+     * 默认参考用户名称
+     */
+    @ExcelProperty(value = "参考用户名称")
+    private String defaultTargetUserName;
+
 
 }

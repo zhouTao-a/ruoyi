@@ -67,7 +67,10 @@ public class MsgGroupController extends BaseController {
     @GetMapping("/{id}")
     public R<MsgGroupVo> getInfo(@NotNull(message = "主键不能为空")
                                      @PathVariable Long id) {
-        return R.ok(msgGroupService.queryById(id));
+        MsgGroupBo msgGroupBo = new MsgGroupBo();
+        msgGroupBo.setId(id);
+        TableDataInfo<MsgGroupVo> msgGroupVoTableDataInfo = msgGroupService.queryPageList(msgGroupBo, new PageQuery(1, 1));
+        return R.ok(msgGroupVoTableDataInfo.getRows().get(0));
     }
 
     /**

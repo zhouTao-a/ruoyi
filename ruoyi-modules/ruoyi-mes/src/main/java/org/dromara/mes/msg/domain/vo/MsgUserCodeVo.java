@@ -18,17 +18,19 @@ public class MsgUserCodeVo implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
+    /**
+     * 主键
+     */
+    private Long id;
 
     /**
      * 用户名
      */
-    @ExcelProperty(value = "用户名")
     private String userName;
 
     /**
      * 用户编码
      */
-    @ExcelProperty(value = "用户编码")
     private String userCode;
 
 }

@@ -77,6 +77,7 @@ public class MsgGroupServiceImpl implements IMsgGroupService {
     @Override
     public Boolean insertByBo(MsgGroupBo bo) {
         MsgGroup add = MapstructUtils.convert(bo, MsgGroup.class);
+        assert add != null;
         validEntityBeforeSave(add);
         boolean flag = baseMapper.insert(add) > 0;
         if (flag) {
@@ -128,9 +129,6 @@ public class MsgGroupServiceImpl implements IMsgGroupService {
      */
     @Override
     public Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid) {
-        if(isValid){
-            //TODO 做一些业务上的校验,判断是否需要校验
-        }
         return baseMapper.deleteByIds(ids) > 0;
     }
 }

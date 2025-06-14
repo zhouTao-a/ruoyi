@@ -10,15 +10,21 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         g.group_name,
         g.group_code,
         g.default_target_user_id,
-        u.user_code as default_target_user_code
+        u.user_code as default_target_user_code,
+        u.user_name as default_target_user_name
         from mes_msg_group g
         inner join mes_msg_user u on g.default_target_user_id = u.id
         <where>
+            g.deleted_flag = '0'
+            and u.deleted_flag = '0'
             <if test="param.groupName != null and param.groupName != ''">
                 and g.group_name like concat('%', #{param.groupName}, '%')
             </if>
             <if test="param.groupCode != null and param.groupCode != ''">
-                and g.group_code like concat('%', #{groupCode}, '%')
+                and g.group_code like concat('%', #{param.groupCode}, '%')
+            </if>
+            <if test="param.id != null ">
+                and g.id = #{param.id}
             </if>
         </where>
         order by g.update_time desc

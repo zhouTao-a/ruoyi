@@ -9,11 +9,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         select id, user_name, user_code
         from mes_msg_user
         <where>
-            <if test="param.userName != null and param.userName != ''">
-                and user_name like concat('%', #{param.userName}, '%')
+            deleted_flag = '0'
+            <if test="id != null ">
+                and id = #{id}
             </if>
-            <if test="param.userCode != null and param.userCode != ''">
-                and user_code like concat('%', #{param.userCode}, '%')
+            <if test="userName != null and userName != ''">
+                and (user_name like concat('%', #{userName}, '%')
+                or user_code like concat('%', #{userName}, '%'))
             </if>
         </where>
     </select>

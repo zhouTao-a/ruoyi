@@ -52,8 +52,10 @@ public class MsgUserController extends BaseController {
      */
     @SaCheckPermission("msg:msgUser:list")
     @GetMapping("/userCodeList")
-    public TableDataInfo<MsgUserCodeVo> userCodeList(MsgUserBo bo, PageQuery pageQuery) {
-        return msgUserService.queryUserCodePageList(bo, pageQuery);
+    public R<List<MsgUserCodeVo>> userCodeList(@RequestParam(required = false) String userName,
+                                               @RequestParam(required = false) String id,
+                                               PageQuery pageQuery) {
+        return R.ok(msgUserService.queryUserCodePageList(userName, id, pageQuery));
     }
 
     /**

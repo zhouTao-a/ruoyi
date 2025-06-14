@@ -149,8 +149,11 @@ public class MsgUserServiceImpl implements IMsgUserService {
     }
 
     @Override
-    public TableDataInfo<MsgUserCodeVo> queryUserCodePageList(MsgUserBo bo, PageQuery pageQuery) {
-        Page<MsgUserCodeVo> result = baseMapper.queryUserCodePageList(pageQuery.build(), bo);
-        return TableDataInfo.build(result);
+    public List<MsgUserCodeVo> queryUserCodePageList(String userName, String id, PageQuery pageQuery) {
+        if (StringUtils.isNotEmpty(id)) {
+            userName = null;
+        }
+        Page<MsgUserCodeVo> result = baseMapper.queryUserCodePageList(pageQuery.build(), id, userName);
+        return result.getRecords();
     }
 }

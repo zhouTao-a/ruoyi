@@ -70,9 +70,10 @@ public interface IMsgUserService {
     /**
      * 查询用户代码列表
      *
-     * @param bo        查询条件
+     * @param userName  查询条件
+     * @param id        ID
      * @param pageQuery 分页参数
      * @return 用户代码分页列表
      */
-    TableDataInfo<MsgUserCodeVo> queryUserCodePageList(MsgUserBo bo, PageQuery pageQuery);
+    List<MsgUserCodeVo> queryUserCodePageList(String userName, String id, PageQuery pageQuery);
 }
