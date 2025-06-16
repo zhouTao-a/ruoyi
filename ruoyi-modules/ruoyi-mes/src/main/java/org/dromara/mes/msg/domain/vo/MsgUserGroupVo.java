@@ -59,5 +59,29 @@ public class MsgUserGroupVo implements Serializable {
     @ExcelDictFormat(dictType = "kinship_level")
     private String kinshipLevel;
 
+    /**
+     * 分组名称
+     */
+    @ExcelProperty(value = "分组名称")
+    private String groupName;
+
+    /**
+     * 分组编码
+     */
+    @ExcelProperty(value = "分组编码")
+    private String groupCode;
+
+    /**
+     * 用户名
+     */
+    @ExcelProperty(value = "用户名")
+    private String userName;
+
+    /**
+     * 用户编码
+     */
+    @ExcelProperty(value = "用户编码")
+    private String userCode;
+
 
 }

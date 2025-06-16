@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.*;
 import cn.dev33.satoken.annotation.SaCheckPermission;
-import org.dromara.mes.utils.SensitiveDataUtils;
+import org.dromara.mes.system.excel.ExcelExportWrapper;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.validation.annotation.Validated;
 import org.dromara.common.idempotent.annotation.RepeatSubmit;
@@ -17,7 +17,6 @@ import org.dromara.common.core.domain.R;
 import org.dromara.common.core.validate.AddGroup;
 import org.dromara.common.core.validate.EditGroup;
 import org.dromara.common.log.enums.BusinessType;
-import org.dromara.common.excel.utils.ExcelUtil;
 import org.dromara.mes.msg.domain.vo.MsgGroupVo;
 import org.dromara.mes.msg.domain.bo.MsgGroupBo;
 import org.dromara.mes.msg.service.IMsgGroupService;
@@ -36,6 +35,7 @@ import org.dromara.common.mybatis.core.page.TableDataInfo;
 public class MsgGroupController extends BaseController {
 
     private final IMsgGroupService msgGroupService;
+    private final ExcelExportWrapper excelExportWrapper;
 
     /**
      * 查询分组信息列表
@@ -54,8 +54,7 @@ public class MsgGroupController extends BaseController {
     @PostMapping("/export")
     public void export(MsgGroupBo bo, HttpServletResponse response) {
         List<MsgGroupVo> list = msgGroupService.queryList(bo);
-        List<MsgGroupVo> handle = SensitiveDataUtils.handle(list);
-        ExcelUtil.exportExcel(handle, "分组信息", MsgGroupVo.class, response);
+        excelExportWrapper.exportWithSensitiveHandle(list, "分组信息", MsgGroupVo.class, response);
     }
 
     /**

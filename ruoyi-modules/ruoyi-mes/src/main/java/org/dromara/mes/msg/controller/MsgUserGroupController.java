@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.*;
 import cn.dev33.satoken.annotation.SaCheckPermission;
+import org.dromara.mes.system.excel.ExcelExportWrapper;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.validation.annotation.Validated;
 import org.dromara.common.idempotent.annotation.RepeatSubmit;
@@ -16,7 +17,6 @@ import org.dromara.common.core.domain.R;
 import org.dromara.common.core.validate.AddGroup;
 import org.dromara.common.core.validate.EditGroup;
 import org.dromara.common.log.enums.BusinessType;
-import org.dromara.common.excel.utils.ExcelUtil;
 import org.dromara.mes.msg.domain.vo.MsgUserGroupVo;
 import org.dromara.mes.msg.domain.bo.MsgUserGroupBo;
 import org.dromara.mes.msg.service.IMsgUserGroupService;
@@ -35,6 +35,7 @@ import org.dromara.common.mybatis.core.page.TableDataInfo;
 public class MsgUserGroupController extends BaseController {
 
     private final IMsgUserGroupService msgUserGroupService;
+    private final ExcelExportWrapper excelExportWrapper;
 
     /**
      * 查询用户组列表
@@ -53,7 +54,7 @@ public class MsgUserGroupController extends BaseController {
     @PostMapping("/export")
     public void export(MsgUserGroupBo bo, HttpServletResponse response) {
         List<MsgUserGroupVo> list = msgUserGroupService.queryList(bo);
-        ExcelUtil.exportExcel(list, "用户组", MsgUserGroupVo.class, response);
+        excelExportWrapper.exportWithSensitiveHandle(list, "用户组", MsgUserGroupVo.class, response);
     }
 
     /**
@@ -65,7 +66,10 @@ public class MsgUserGroupController extends BaseController {
     @GetMapping("/{id}")
     public R<MsgUserGroupVo> getInfo(@NotNull(message = "主键不能为空")
                                      @PathVariable Long id) {
-        return R.ok(msgUserGroupService.queryById(id));
+        MsgUserGroupBo bo = new MsgUserGroupBo();
+        bo.setId(id);
+        TableDataInfo<MsgUserGroupVo> info = msgUserGroupService.queryPageList(bo, new PageQuery(1, 1));
+        return R.ok(info.getRows().get(0));
     }
 
     /**

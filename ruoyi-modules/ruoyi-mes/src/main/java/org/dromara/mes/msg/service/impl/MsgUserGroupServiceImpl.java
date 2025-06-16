@@ -1,12 +1,9 @@
 package org.dromara.mes.msg.service.impl;
 
 import org.dromara.common.core.utils.MapstructUtils;
-import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.dromara.mes.msg.domain.bo.MsgUserGroupBo;
@@ -16,7 +13,6 @@ import org.dromara.mes.msg.mapper.MsgUserGroupMapper;
 import org.dromara.mes.msg.service.IMsgUserGroupService;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Collection;
 
 /**
@@ -51,8 +47,7 @@ public class MsgUserGroupServiceImpl implements IMsgUserGroupService {
      */
     @Override
     public TableDataInfo<MsgUserGroupVo> queryPageList(MsgUserGroupBo bo, PageQuery pageQuery) {
-        LambdaQueryWrapper<MsgUserGroup> lqw = buildQueryWrapper(bo);
-        Page<MsgUserGroupVo> result = baseMapper.selectVoPage(pageQuery.build(), lqw);
+        Page<MsgUserGroupVo> result = baseMapper.queryPageList(pageQuery.build(), bo);
         return TableDataInfo.build(result);
     }
 
@@ -64,19 +59,8 @@ public class MsgUserGroupServiceImpl implements IMsgUserGroupService {
      */
     @Override
     public List<MsgUserGroupVo> queryList(MsgUserGroupBo bo) {
-        LambdaQueryWrapper<MsgUserGroup> lqw = buildQueryWrapper(bo);
-        return baseMapper.selectVoList(lqw);
-    }
-
-    private LambdaQueryWrapper<MsgUserGroup> buildQueryWrapper(MsgUserGroupBo bo) {
-        Map<String, Object> params = bo.getParams();
-        LambdaQueryWrapper<MsgUserGroup> lqw = Wrappers.lambdaQuery();
-        lqw.orderByAsc(MsgUserGroup::getId);
-        lqw.eq(bo.getUserId() != null, MsgUserGroup::getUserId, bo.getUserId());
-        lqw.eq(bo.getGroupId() != null, MsgUserGroup::getGroupId, bo.getGroupId());
-        lqw.eq(bo.getRelativeGenerationDiff() != null, MsgUserGroup::getRelativeGenerationDiff, bo.getRelativeGenerationDiff());
-        lqw.eq(StringUtils.isNotBlank(bo.getKinshipLevel()), MsgUserGroup::getKinshipLevel, bo.getKinshipLevel());
-        return lqw;
+        Page<MsgUserGroupVo> result = baseMapper.queryPageList(new PageQuery().build(), bo);
+        return result.getRecords();
     }
 
     /**
