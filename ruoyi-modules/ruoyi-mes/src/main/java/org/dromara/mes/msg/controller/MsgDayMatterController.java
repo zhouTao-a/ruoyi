@@ -65,7 +65,10 @@ public class MsgDayMatterController extends BaseController {
     @GetMapping("/{id}")
     public R<MsgDayMatterVo> getInfo(@NotNull(message = "主键不能为空")
                                      @PathVariable Long id) {
-        return R.ok(msgDayMatterService.queryById(id));
+        MsgDayMatterBo bo = new MsgDayMatterBo();
+        bo.setId(id);
+        List<MsgDayMatterVo> rows = msgDayMatterService.queryPageList(bo, new PageQuery(1, 1)).getRows();
+        return rows.isEmpty() ? R.fail("数据不存在") : R.ok(rows.get(0));
     }
 
     /**

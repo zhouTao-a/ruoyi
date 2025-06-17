@@ -74,10 +74,10 @@ CREATE TABLE mes_msg_user_group (
 CREATE TABLE mes_msg_day_matter (
                                     id BIGINT NOT NULL PRIMARY KEY COMMENT '主键ID',
                                     day_name VARCHAR(255) NOT NULL COMMENT '事件名称',
-                                    day_target DATETIME NOT NULL COMMENT '事件目标时间（含时分）',
+                                    day_target DATETIME NOT NULL COMMENT '事件时间',
                                     day_type VARCHAR(20) NOT NULL COMMENT '事件类型（life, work, anniversary, birthday）',
                                     remind_type VARCHAR(20) NOT NULL COMMENT '提醒周期（minutely, hourly, daily, weekly, monthly, yearly）',
-                                    repeat_flag VARCHAR(1) DEFAULT 'F' NOT NULL COMMENT '是否重复提醒（T/F）',
+                                    repeat_flag VARCHAR(1) DEFAULT 'F' NOT NULL COMMENT '重复提醒',
                                     notify_status VARCHAR(20) DEFAULT 'pending' COMMENT '通知状态（pending, notified, expired, disabled）',
                                     next_notify_time DATETIME DEFAULT NULL COMMENT '下次通知时间',
                                     user_id BIGINT DEFAULT NULL COMMENT '所属用户ID',

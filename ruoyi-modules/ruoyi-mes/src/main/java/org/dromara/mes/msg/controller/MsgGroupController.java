@@ -80,8 +80,8 @@ public class MsgGroupController extends BaseController {
                                      @PathVariable Long id) {
         MsgGroupBo msgGroupBo = new MsgGroupBo();
         msgGroupBo.setId(id);
-        TableDataInfo<MsgGroupVo> msgGroupVoTableDataInfo = msgGroupService.queryPageList(msgGroupBo, new PageQuery(1, 1));
-        return R.ok(msgGroupVoTableDataInfo.getRows().get(0));
+        List<MsgGroupVo> rows = msgGroupService.queryPageList(msgGroupBo, new PageQuery(1, 1)).getRows();
+        return rows.isEmpty() ? R.fail("数据不存在") : R.ok(rows.get(0));
     }
 
     /**

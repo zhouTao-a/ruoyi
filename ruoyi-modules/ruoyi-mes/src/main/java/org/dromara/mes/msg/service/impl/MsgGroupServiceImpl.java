@@ -77,9 +77,9 @@ public class MsgGroupServiceImpl implements IMsgGroupService {
      */
     @Override
     public Boolean insertByBo(MsgGroupBo bo) {
+        validEntityBeforeSave(bo);
         MsgGroup add = MapstructUtils.convert(bo, MsgGroup.class);
         assert add != null;
-        validEntityBeforeSave(add);
         boolean flag = baseMapper.insert(add) > 0;
         if (flag) {
             bo.setId(add.getId());
@@ -95,13 +95,8 @@ public class MsgGroupServiceImpl implements IMsgGroupService {
      */
     @Override
     public Boolean updateByBo(MsgGroupBo bo) {
+        validEntityBeforeSave(bo);
         LambdaUpdateWrapper<MsgGroup> updateWrapper = new LambdaUpdateWrapper<>();
-        List<MsgGroupVo> msgGroupVos = baseMapper.selectVoList(Wrappers.<MsgGroup>lambdaQuery()
-            .eq(MsgGroup::getGroupCode, bo.getGroupCode())
-            .ne(MsgGroup::getId, bo.getId()));
-        if (!msgGroupVos.isEmpty()) {
-            throw new ServiceException("分组代码不能重复!");
-        }
         updateWrapper.eq(MsgGroup::getId, bo.getId())
             .set(MsgGroup::getGroupName, bo.getGroupName())
             .set(MsgGroup::getGroupCode, bo.getGroupCode())
@@ -113,9 +108,10 @@ public class MsgGroupServiceImpl implements IMsgGroupService {
     /**
      * 保存前的数据校验
      */
-    private void validEntityBeforeSave(MsgGroup entity){
+    private void validEntityBeforeSave(MsgGroupBo entity){
         List<MsgGroupVo> msgGroupVoList = baseMapper.selectVoList(Wrappers.<MsgGroup>lambdaQuery()
-            .eq(MsgGroup::getGroupCode, entity.getGroupCode()));
+            .eq(MsgGroup::getGroupCode, entity.getGroupCode())
+            .ne(entity.getId() != null, MsgGroup::getId, entity.getId()));
         if (!msgGroupVoList.isEmpty()) {
             throw new ServiceException("用户代码不能重复!");
         }

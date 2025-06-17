@@ -33,7 +33,6 @@ public class MsgDayMatterVo implements Serializable {
     /**
      * 主键ID
      */
-    @ExcelProperty(value = "主键ID")
     private Long id;
 
     /**
@@ -43,10 +42,9 @@ public class MsgDayMatterVo implements Serializable {
     private String dayName;
 
     /**
-     * 事件目标时间（含时分）
+     * 事件时间
      */
-    @ExcelProperty(value = "事件目标时间", converter = ExcelDictConvert.class)
-    @ExcelDictFormat(readConverterExp = "含=时分")
+    @ExcelProperty(value = "事件时间", converter = ExcelDictConvert.class)
     private Date dayTarget;
 
     /**
@@ -64,9 +62,9 @@ public class MsgDayMatterVo implements Serializable {
     private String remindType;
 
     /**
-     * 是否重复提醒（T/F）
+     * 重复提醒
      */
-    @ExcelProperty(value = "是否重复提醒", converter = ExcelDictConvert.class)
+    @ExcelProperty(value = "重复提醒", converter = ExcelDictConvert.class)
     @ExcelDictFormat(dictType = "whether_flag")
     private String repeatFlag;
 
@@ -86,14 +84,36 @@ public class MsgDayMatterVo implements Serializable {
     /**
      * 所属用户ID
      */
-    @ExcelProperty(value = "所属用户ID")
     private Long userId;
 
     /**
      * 所属分组ID
      */
-    @ExcelProperty(value = "所属分组ID")
     private Long groupId;
+
+    /**
+     * 用户名
+     */
+    @ExcelProperty(value = "用户名称")
+    private String userName;
+
+    /**
+     * 用户编码
+     */
+    @ExcelProperty(value = "用户编码")
+    private String userCode;
+
+    /**
+     * 分组名称
+     */
+    @ExcelProperty(value = "分组名称")
+    private String groupName;
+
+    /**
+     * 分组编码
+     */
+    @ExcelProperty(value = "分组编码")
+    private String groupCode;
 
 
 }

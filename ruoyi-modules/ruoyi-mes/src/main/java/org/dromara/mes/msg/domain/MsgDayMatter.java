@@ -35,7 +35,7 @@ public class MsgDayMatter extends TenantEntity {
     private String dayName;
 
     /**
-     * 事件目标时间（含时分）
+     * 事件时间
      */
     private Date dayTarget;
 
@@ -50,7 +50,7 @@ public class MsgDayMatter extends TenantEntity {
     private String remindType;
 
     /**
-     * 是否重复提醒（T/F）
+     * 重复提醒
      */
     private String repeatFlag;
 

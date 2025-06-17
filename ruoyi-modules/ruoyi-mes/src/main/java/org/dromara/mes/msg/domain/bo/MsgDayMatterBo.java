@@ -35,33 +35,33 @@ public class MsgDayMatterBo extends BaseEntity {
     private String dayName;
 
     /**
-     * 事件目标时间（含时分）
+     * 事件时间
      */
-    @NotNull(message = "事件目标时间（含时分）不能为空", groups = { AddGroup.class, EditGroup.class })
+    @NotNull(message = "事件时间不能为空", groups = { AddGroup.class, EditGroup.class })
     private Date dayTarget;
 
     /**
      * 事件类型（life, work, anniversary, birthday）
      */
-    @NotBlank(message = "事件类型（life, work, anniversary, birthday）不能为空", groups = { AddGroup.class, EditGroup.class })
+    @NotBlank(message = "事件类型不能为空", groups = { AddGroup.class, EditGroup.class })
     private String dayType;
 
     /**
      * 提醒周期（minutely, hourly, daily, weekly, monthly, yearly）
      */
-    @NotBlank(message = "提醒周期（minutely, hourly, daily, weekly, monthly, yearly）不能为空", groups = { AddGroup.class, EditGroup.class })
+    @NotBlank(message = "提醒周期不能为空", groups = { AddGroup.class, EditGroup.class })
     private String remindType;
 
     /**
-     * 是否重复提醒（T/F）
+     * 重复提醒
      */
-    @NotBlank(message = "是否重复提醒（T/F）不能为空", groups = { AddGroup.class, EditGroup.class })
+    @NotBlank(message = "重复提醒不能为空", groups = { AddGroup.class, EditGroup.class })
     private String repeatFlag;
 
     /**
      * 通知状态（pending, notified, expired, disabled）
      */
-    @NotBlank(message = "通知状态（pending, notified, expired, disabled）不能为空", groups = { AddGroup.class, EditGroup.class })
+    @NotBlank(message = "通知状态不能为空", groups = { AddGroup.class, EditGroup.class })
     private String notifyStatus;
 
     /**
@@ -72,13 +72,11 @@ public class MsgDayMatterBo extends BaseEntity {
     /**
      * 所属用户ID
      */
-    @NotNull(message = "所属用户ID不能为空", groups = { AddGroup.class, EditGroup.class })
     private Long userId;
 
     /**
      * 所属分组ID
      */
-    @NotNull(message = "所属分组ID不能为空", groups = { AddGroup.class, EditGroup.class })
     private Long groupId;
 
 

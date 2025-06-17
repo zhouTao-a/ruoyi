@@ -1,11 +1,11 @@
 package org.dromara.mes.msg.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.MapstructUtils;
-import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,8 +15,8 @@ import org.dromara.mes.msg.domain.MsgDayMatter;
 import org.dromara.mes.msg.mapper.MsgDayMatterMapper;
 import org.dromara.mes.msg.service.IMsgDayMatterService;
 
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Collection;
 
 /**
@@ -51,8 +51,7 @@ public class MsgDayMatterServiceImpl implements IMsgDayMatterService {
      */
     @Override
     public TableDataInfo<MsgDayMatterVo> queryPageList(MsgDayMatterBo bo, PageQuery pageQuery) {
-        LambdaQueryWrapper<MsgDayMatter> lqw = buildQueryWrapper(bo);
-        Page<MsgDayMatterVo> result = baseMapper.selectVoPage(pageQuery.build(), lqw);
+        Page<MsgDayMatterVo> result = baseMapper.queryPageList(pageQuery.build(), bo);
         return TableDataInfo.build(result);
     }
 
@@ -64,20 +63,7 @@ public class MsgDayMatterServiceImpl implements IMsgDayMatterService {
      */
     @Override
     public List<MsgDayMatterVo> queryList(MsgDayMatterBo bo) {
-        LambdaQueryWrapper<MsgDayMatter> lqw = buildQueryWrapper(bo);
-        return baseMapper.selectVoList(lqw);
-    }
-
-    private LambdaQueryWrapper<MsgDayMatter> buildQueryWrapper(MsgDayMatterBo bo) {
-        Map<String, Object> params = bo.getParams();
-        LambdaQueryWrapper<MsgDayMatter> lqw = Wrappers.lambdaQuery();
-        lqw.orderByAsc(MsgDayMatter::getId);
-        lqw.like(StringUtils.isNotBlank(bo.getDayName()), MsgDayMatter::getDayName, bo.getDayName());
-        lqw.eq(StringUtils.isNotBlank(bo.getDayType()), MsgDayMatter::getDayType, bo.getDayType());
-        lqw.ge(bo.getNextNotifyTime() != null, MsgDayMatter::getNextNotifyTime, bo.getNextNotifyTime());
-        lqw.eq(bo.getUserId() != null, MsgDayMatter::getUserId, bo.getUserId());
-        lqw.eq(bo.getGroupId() != null, MsgDayMatter::getGroupId, bo.getGroupId());
-        return lqw;
+        return baseMapper.queryPageList(new PageQuery().build(), bo).getRecords();
     }
 
     /**
@@ -88,8 +74,9 @@ public class MsgDayMatterServiceImpl implements IMsgDayMatterService {
      */
     @Override
     public Boolean insertByBo(MsgDayMatterBo bo) {
+        validEntityBeforeSave(bo);
         MsgDayMatter add = MapstructUtils.convert(bo, MsgDayMatter.class);
-        validEntityBeforeSave(add);
+        assert add != null;
         boolean flag = baseMapper.insert(add) > 0;
         if (flag) {
             bo.setId(add.getId());
@@ -105,16 +92,32 @@ public class MsgDayMatterServiceImpl implements IMsgDayMatterService {
      */
     @Override
     public Boolean updateByBo(MsgDayMatterBo bo) {
-        MsgDayMatter update = MapstructUtils.convert(bo, MsgDayMatter.class);
-        validEntityBeforeSave(update);
-        return baseMapper.updateById(update) > 0;
+        validEntityBeforeSave(bo);
+        LambdaUpdateWrapper<MsgDayMatter> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.eq(MsgDayMatter::getId, bo.getId())
+            .set(MsgDayMatter::getDayName, bo.getDayName())
+            .set(MsgDayMatter::getDayTarget, bo.getDayTarget())
+            .set(MsgDayMatter::getDayType, bo.getDayType())
+            .set(MsgDayMatter::getRemindType, bo.getRemindType())
+            .set(MsgDayMatter::getRepeatFlag, bo.getRepeatFlag())
+            .set(MsgDayMatter::getNotifyStatus, bo.getNotifyStatus())
+            .set(MsgDayMatter::getUserId, bo.getUserId())
+            .set(MsgDayMatter::getGroupId, bo.getGroupId())
+            .set(MsgDayMatter::getUpdateTime, new Date());
+        return baseMapper.update(updateWrapper) > 0;
     }
 
     /**
      * 保存前的数据校验
      */
-    private void validEntityBeforeSave(MsgDayMatter entity){
-        //TODO 做一些数据校验,如唯一约束
+    private void validEntityBeforeSave(MsgDayMatterBo entity){
+        List<MsgDayMatterVo> msgDayMatterVoList = baseMapper.selectVoList(Wrappers.<MsgDayMatter>lambdaQuery()
+            .eq(MsgDayMatter::getDayName, entity.getDayName())
+            .ne(entity.getId() != null, MsgDayMatter::getId, entity.getId()));
+        if (!msgDayMatterVoList.isEmpty()) {
+            throw new ServiceException("事件名称不能重复!");
+        }
+        //TODO 对下次执行时间设值
     }
 
     /**
@@ -126,9 +129,6 @@ public class MsgDayMatterServiceImpl implements IMsgDayMatterService {
      */
     @Override
     public Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid) {
-        if(isValid){
-            //TODO 做一些业务上的校验,判断是否需要校验
-        }
         return baseMapper.deleteByIds(ids) > 0;
     }
 }

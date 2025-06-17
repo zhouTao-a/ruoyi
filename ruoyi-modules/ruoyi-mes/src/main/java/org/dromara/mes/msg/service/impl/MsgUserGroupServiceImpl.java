@@ -75,9 +75,9 @@ public class MsgUserGroupServiceImpl implements IMsgUserGroupService {
      */
     @Override
     public Boolean insertByBo(MsgUserGroupBo bo) {
+        validEntityBeforeSave(bo);
         MsgUserGroup add = MapstructUtils.convert(bo, MsgUserGroup.class);
         assert add != null;
-        validEntityBeforeSave(add);
         boolean flag = baseMapper.insert(add) > 0;
         if (flag) {
             bo.setId(add.getId());
@@ -112,10 +112,11 @@ public class MsgUserGroupServiceImpl implements IMsgUserGroupService {
     /**
      * 保存前的数据校验
      */
-    private void validEntityBeforeSave(MsgUserGroup entity){
+    private void validEntityBeforeSave(MsgUserGroupBo entity){
         List<MsgUserGroupVo> msgUserGroupList = baseMapper.selectVoList(new LambdaQueryWrapper<MsgUserGroup>()
             .eq(MsgUserGroup::getUserId, entity.getUserId())
-            .eq(MsgUserGroup::getGroupId, entity.getGroupId()));
+            .eq(MsgUserGroup::getGroupId, entity.getGroupId())
+            .ne(entity.getId() != null, MsgUserGroup::getId, entity.getId()));
         if (!msgUserGroupList.isEmpty()) {
             throw new ServiceException("用户组已存在!");
         }

@@ -85,9 +85,9 @@ public class MsgUserServiceImpl implements IMsgUserService {
      */
     @Override
     public Boolean insertByBo(MsgUserBo bo) {
+        validEntityBeforeSave(bo);
         MsgUser add = MapstructUtils.convert(bo, MsgUser.class);
         assert add != null;
-        validEntityBeforeSave(add);
         boolean flag = baseMapper.insert(add) > 0;
         if (flag) {
             bo.setId(add.getId());
@@ -103,13 +103,8 @@ public class MsgUserServiceImpl implements IMsgUserService {
      */
     @Override
     public Boolean updateByBo(MsgUserBo bo) {
+        validEntityBeforeSave(bo);
         LambdaUpdateWrapper<MsgUser> updateWrapper = new LambdaUpdateWrapper<>();
-        List<MsgUserVo> msgUserVos = baseMapper.selectVoList(Wrappers.<MsgUser>lambdaQuery()
-            .eq(MsgUser::getUserCode, bo.getUserCode())
-            .ne(MsgUser::getId, bo.getId()));
-        if (!msgUserVos.isEmpty()) {
-            throw new ServiceException("用户代码不能重复!");
-        }
         updateWrapper.eq(MsgUser::getId, bo.getId())
             .set(MsgUser::getBirthday, bo.getBirthday())
             .set(MsgUser::getEmail, bo.getEmail())
@@ -128,9 +123,10 @@ public class MsgUserServiceImpl implements IMsgUserService {
     /**
      * 保存前的数据校验
      */
-    private void validEntityBeforeSave(MsgUser entity){
+    private void validEntityBeforeSave(MsgUserBo entity){
         List<MsgUserVo> msgUserVos = baseMapper.selectVoList(Wrappers.<MsgUser>lambdaQuery()
-            .eq(MsgUser::getUserCode, entity.getUserCode()));
+            .eq(MsgUser::getUserCode, entity.getUserCode())
+            .ne(entity.getId() != null, MsgUser::getId, entity.getId()));
         if (!msgUserVos.isEmpty()) {
             throw new ServiceException("用户代码不能重复!");
         }
