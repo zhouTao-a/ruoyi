@@ -1,5 +1,8 @@
 package org.dromara.mes.msg.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.mybatis.core.page.PageQuery;
@@ -12,6 +15,7 @@ import org.dromara.mes.msg.domain.MsgUserGroup;
 import org.dromara.mes.msg.mapper.MsgUserGroupMapper;
 import org.dromara.mes.msg.service.IMsgUserGroupService;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Collection;
 
@@ -72,6 +76,7 @@ public class MsgUserGroupServiceImpl implements IMsgUserGroupService {
     @Override
     public Boolean insertByBo(MsgUserGroupBo bo) {
         MsgUserGroup add = MapstructUtils.convert(bo, MsgUserGroup.class);
+        assert add != null;
         validEntityBeforeSave(add);
         boolean flag = baseMapper.insert(add) > 0;
         if (flag) {
@@ -88,16 +93,32 @@ public class MsgUserGroupServiceImpl implements IMsgUserGroupService {
      */
     @Override
     public Boolean updateByBo(MsgUserGroupBo bo) {
-        MsgUserGroup update = MapstructUtils.convert(bo, MsgUserGroup.class);
-        validEntityBeforeSave(update);
-        return baseMapper.updateById(update) > 0;
+        List<MsgUserGroupVo> msgUserGroupList = baseMapper.selectVoList(new LambdaQueryWrapper<MsgUserGroup>()
+            .eq(MsgUserGroup::getUserId, bo.getUserId())
+            .eq(MsgUserGroup::getGroupId, bo.getGroupId())
+            .ne(MsgUserGroup::getId, bo.getId()));
+        if (!msgUserGroupList.isEmpty()) {
+            throw new ServiceException("用户组已存在!");
+        }
+        LambdaUpdateWrapper<MsgUserGroup> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.eq(MsgUserGroup::getId, bo.getId());
+        updateWrapper.set(MsgUserGroup::getUserId, bo.getUserId());
+        updateWrapper.set(MsgUserGroup::getRelativeGenerationDiff, bo.getRelativeGenerationDiff());
+        updateWrapper.set(MsgUserGroup::getKinshipLevel, bo.getKinshipLevel());
+        updateWrapper.set(MsgUserGroup::getUpdateTime, new Date());
+        return baseMapper.update(updateWrapper) > 0;
     }
 
     /**
      * 保存前的数据校验
      */
     private void validEntityBeforeSave(MsgUserGroup entity){
-        //TODO 做一些数据校验,如唯一约束
+        List<MsgUserGroupVo> msgUserGroupList = baseMapper.selectVoList(new LambdaQueryWrapper<MsgUserGroup>()
+            .eq(MsgUserGroup::getUserId, entity.getUserId())
+            .eq(MsgUserGroup::getGroupId, entity.getGroupId()));
+        if (!msgUserGroupList.isEmpty()) {
+            throw new ServiceException("用户组已存在!");
+        }
     }
 
     /**
@@ -109,9 +130,6 @@ public class MsgUserGroupServiceImpl implements IMsgUserGroupService {
      */
     @Override
     public Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid) {
-        if(isValid){
-            //TODO 做一些业务上的校验,判断是否需要校验
-        }
         return baseMapper.deleteByIds(ids) > 0;
     }
 }

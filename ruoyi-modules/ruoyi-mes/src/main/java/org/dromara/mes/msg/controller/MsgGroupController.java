@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.*;
 import cn.dev33.satoken.annotation.SaCheckPermission;
+import org.dromara.mes.msg.domain.vo.MsgGroupCodeVo;
 import org.dromara.mes.system.excel.ExcelExportWrapper;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.validation.annotation.Validated;
@@ -44,6 +45,17 @@ public class MsgGroupController extends BaseController {
     @GetMapping("/list")
     public TableDataInfo<MsgGroupVo> list(MsgGroupBo bo, PageQuery pageQuery) {
         return msgGroupService.queryPageList(bo, pageQuery);
+    }
+
+    /**
+     * 查询分组信息列表
+     */
+    @SaCheckPermission("msg:msgGroup:list")
+    @GetMapping("/groupCodeList")
+    public R<List<MsgGroupCodeVo>> groupCodeList(@RequestParam(required = false) String groupName,
+                                              @RequestParam(required = false) String id,
+                                              PageQuery pageQuery) {
+        return R.ok(msgGroupService.queryGroupCodePageList(groupName, id, pageQuery));
     }
 
     /**

@@ -29,4 +29,23 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </where>
         order by g.update_time desc
     </select>
+
+    <select id="queryGroupCodePageList" resultType="org.dromara.mes.msg.domain.vo.MsgGroupCodeVo">
+        select
+            g.id,
+            g.group_name,
+            g.group_code
+        from mes_msg_group g
+        <where>
+            g.deleted_flag = '0'
+            <if test="groupName != null and groupName != ''">
+                and (g.group_name like concat('%', #{groupName}, '%')
+                or g.group_code like concat ('%', #{groupName}, '%'))
+            </if>
+            <if test="id != null ">
+                and g.id = #{id}
+            </if>
+        </where>
+        order by g.update_time desc
+    </select>
 </mapper>

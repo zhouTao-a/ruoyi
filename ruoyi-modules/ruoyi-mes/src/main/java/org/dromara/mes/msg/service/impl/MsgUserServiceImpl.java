@@ -122,7 +122,7 @@ public class MsgUserServiceImpl implements IMsgUserService {
             .set(MsgUser::getUserCode, bo.getUserCode())
             .set(MsgUser::getUserName, bo.getUserName())
             .set(MsgUser::getUpdateTime, new Date());
-        return baseMapper.update(null, updateWrapper) > 0;
+        return baseMapper.update(updateWrapper) > 0;
     }
 
     /**

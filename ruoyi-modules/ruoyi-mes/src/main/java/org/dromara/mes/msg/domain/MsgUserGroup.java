@@ -38,7 +38,7 @@ public class MsgUserGroup extends TenantEntity {
     private Long groupId;
 
     /**
-     * 代际差
+     * 辈分差
      */
     private Long relativeGenerationDiff;
 

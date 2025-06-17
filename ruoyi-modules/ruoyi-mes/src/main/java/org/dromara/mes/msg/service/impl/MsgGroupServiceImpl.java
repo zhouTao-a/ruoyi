@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.RequiredArgsConstructor;
 import org.dromara.mes.msg.domain.MsgGroup;
+import org.dromara.mes.msg.domain.vo.MsgGroupCodeVo;
 import org.dromara.mes.msg.domain.vo.MsgGroupVo;
 import org.springframework.stereotype.Service;
 import org.dromara.mes.msg.domain.bo.MsgGroupBo;
@@ -106,7 +107,7 @@ public class MsgGroupServiceImpl implements IMsgGroupService {
             .set(MsgGroup::getGroupCode, bo.getGroupCode())
             .set(MsgGroup::getDefaultTargetUserId, bo.getDefaultTargetUserId())
             .set(MsgGroup::getUpdateTime, new Date());
-        return baseMapper.update(null, updateWrapper) > 0;
+        return baseMapper.update(updateWrapper) > 0;
     }
 
     /**
@@ -130,5 +131,13 @@ public class MsgGroupServiceImpl implements IMsgGroupService {
     @Override
     public Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid) {
         return baseMapper.deleteByIds(ids) > 0;
+    }
+
+    @Override
+    public List<MsgGroupCodeVo> queryGroupCodePageList(String groupName, String id, PageQuery pageQuery) {
+        if (id != null) {
+            groupName = null;
+        }
+        return baseMapper.queryGroupCodePageList(pageQuery.build(), groupName, id);
     }
 }

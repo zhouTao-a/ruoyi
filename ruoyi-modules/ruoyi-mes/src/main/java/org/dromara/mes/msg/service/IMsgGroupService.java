@@ -1,5 +1,6 @@
 package org.dromara.mes.msg.service;
 
+import org.dromara.mes.msg.domain.vo.MsgGroupCodeVo;
 import org.dromara.mes.msg.domain.vo.MsgGroupVo;
 import org.dromara.mes.msg.domain.bo.MsgGroupBo;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
@@ -65,4 +66,14 @@ public interface IMsgGroupService {
      * @return 是否删除成功
      */
     Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid);
+
+    /**
+     * 查询分组信息列表
+     *
+     * @param groupName 分组名称
+     * @param id        主键
+     * @param pageQuery 分页参数
+     * @return 分组信息列表
+     */
+    List<MsgGroupCodeVo> queryGroupCodePageList(String groupName, String id, PageQuery pageQuery);
 }

@@ -59,7 +59,7 @@ CREATE TABLE mes_msg_user_group (
                                     id BIGINT NOT NULL PRIMARY KEY COMMENT '主键ID',
                                     user_id BIGINT NOT NULL COMMENT '用户ID',
                                     group_id BIGINT NOT NULL COMMENT '分组ID',
-                                    relative_generation_diff INT DEFAULT 0 COMMENT '与参考用户的代际差',
+                                    relative_generation_diff INT DEFAULT 0 COMMENT '与参考用户的辈分差',
                                     kinship_level VARCHAR(20) NOT NULL DEFAULT 'close' COMMENT '亲缘关系（close, distant, friend, stranger）',
                                     deleted_flag VARCHAR(1) DEFAULT '0' NOT NULL COMMENT '逻辑删除标志',
                                     tenant_id VARCHAR(20) DEFAULT '000000' COMMENT '租户编号',

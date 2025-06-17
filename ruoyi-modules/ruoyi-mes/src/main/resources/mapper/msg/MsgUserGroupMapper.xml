@@ -36,11 +36,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                 and (u.user_name like concat('%', #{param.userName}, '%')
                 or u.user_code like concat('%', #{param.userName}, '%'))
             </if>
-            <if test="relativeGenerationDiff != null">
-                and ug.relative_generation_diff = #{relativeGenerationDiff}
+            <if test="param.relativeGenerationDiff != null">
+                and ug.relative_generation_diff = #{param.relativeGenerationDiff}
             </if>
-            <if test="kinshipLevel != null">
-                and ug.kinship_level = #{kinshipLevel}
+            <if test="param.kinshipLevel != null">
+                and ug.kinship_level = #{param.kinshipLevel}
             </if>
         </where>
         order by ug.update_time desc

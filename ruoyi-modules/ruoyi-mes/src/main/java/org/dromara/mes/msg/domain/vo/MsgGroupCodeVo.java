@@ -1,5 +1,6 @@
 package org.dromara.mes.msg.domain.vo;
 
+import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import lombok.Data;
 
 import java.io.Serial;
@@ -7,29 +8,32 @@ import java.io.Serializable;
 
 
 /**
- * 用户
+ * 分组信息
  *
  * @author zhout
  * @date 2025-06-08
  */
 @Data
-public class MsgUserCodeVo implements Serializable {
+@ExcelIgnoreUnannotated
+public class MsgGroupCodeVo implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
+
     /**
-     * 主键
+     * 主键ID
      */
     private Long id;
 
     /**
-     * 用户名
+     * 分组名称
      */
-    private String userName;
+    private String groupName;
 
     /**
-     * 用户编码
+     * 分组编码
      */
-    private String userCode;
+    private String groupCode;
+
 
 }

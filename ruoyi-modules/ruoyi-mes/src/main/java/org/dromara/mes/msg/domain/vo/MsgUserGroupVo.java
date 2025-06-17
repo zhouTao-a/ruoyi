@@ -31,33 +31,29 @@ public class MsgUserGroupVo implements Serializable {
     /**
      * 主键ID
      */
-    @ExcelProperty(value = "主键ID")
     private Long id;
 
     /**
      * 用户ID
      */
-    @ExcelProperty(value = "用户ID")
     private Long userId;
 
     /**
      * 分组ID
      */
-    @ExcelProperty(value = "分组ID")
     private Long groupId;
 
     /**
-     * 代际差
+     * 用户名
      */
-    @ExcelProperty(value = "代际差")
-    private Long relativeGenerationDiff;
+    @ExcelProperty(value = "用户名称")
+    private String userName;
 
     /**
-     * 亲缘关系（close, distant, friend, stranger）
+     * 用户编码
      */
-    @ExcelProperty(value = "亲缘关系", converter = ExcelDictConvert.class)
-    @ExcelDictFormat(dictType = "kinship_level")
-    private String kinshipLevel;
+    @ExcelProperty(value = "用户编码")
+    private String userCode;
 
     /**
      * 分组名称
@@ -72,16 +68,15 @@ public class MsgUserGroupVo implements Serializable {
     private String groupCode;
 
     /**
-     * 用户名
+     * 辈分差
      */
-    @ExcelProperty(value = "用户名")
-    private String userName;
+    @ExcelProperty(value = "辈分差")
+    private Long relativeGenerationDiff;
 
     /**
-     * 用户编码
+     * 亲缘关系（close, distant, friend, stranger）
      */
-    @ExcelProperty(value = "用户编码")
-    private String userCode;
-
-
+    @ExcelProperty(value = "亲缘关系", converter = ExcelDictConvert.class)
+    @ExcelDictFormat(dictType = "kinship_level")
+    private String kinshipLevel;
 }

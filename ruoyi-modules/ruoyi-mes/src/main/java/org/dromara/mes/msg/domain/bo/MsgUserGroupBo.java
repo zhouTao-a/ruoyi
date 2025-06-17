@@ -39,8 +39,11 @@ public class MsgUserGroupBo extends BaseEntity {
     private Long groupId;
 
     /**
-     * 代际差
+     * 辈分差
      */
+    @NotNull(message = "辈分差不能为空", groups = { AddGroup.class, EditGroup.class })
+    @Min(value = -100, message = "辈分差不能小于-100", groups = { AddGroup.class, EditGroup.class })
+    @Max(value = 100, message = "辈分差不能大于100", groups = { AddGroup.class, EditGroup.class })
     private Long relativeGenerationDiff;
 
     /**
@@ -48,6 +51,16 @@ public class MsgUserGroupBo extends BaseEntity {
      */
     @NotBlank(message = "亲缘关系（close, distant, friend, stranger）不能为空", groups = { AddGroup.class, EditGroup.class })
     private String kinshipLevel;
+
+    /**
+     * 分组名称
+     */
+    private String groupName;
+
+    /**
+     * 用户名
+     */
+    private String userName;
 
 
 }
