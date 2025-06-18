@@ -31,7 +31,7 @@ public class MsgUserBo extends BaseEntity {
      * 用户名
      */
     @NotBlank(message = "用户名不能为空", groups = { AddGroup.class, EditGroup.class })
-    @Size(min = 0, max = 20, message = "用户名长度不能超过20个字符", groups = { AddGroup.class, EditGroup.class })
+    @Size(max = 20, message = "用户名长度不能超过20个字符", groups = { AddGroup.class, EditGroup.class })
     private String userName;
 
     /**

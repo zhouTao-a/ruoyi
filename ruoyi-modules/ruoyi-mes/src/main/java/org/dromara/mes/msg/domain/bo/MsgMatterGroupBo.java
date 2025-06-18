@@ -20,8 +20,6 @@ import jakarta.validation.constraints.*;
 @AutoMapper(target = MsgMatterGroup.class, reverseConvertGenerate = false)
 public class MsgMatterGroupBo extends BaseEntity {
 
-    private static final long serialVersionUID = 1L;
-
     /**
      * 主键ID
      */

@@ -5,9 +5,6 @@ import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import java.util.Date;
-import com.fasterxml.jackson.annotation.JsonFormat;
-
-import java.io.Serial;
 
 /**
  * 用户对象 mes_msg_user
@@ -19,9 +16,6 @@ import java.io.Serial;
 @EqualsAndHashCode(callSuper = true)
 @TableName("mes_msg_user")
 public class MsgUser extends TenantEntity {
-
-    @Serial
-    private static final long serialVersionUID = 1L;
 
     /**
      * 主键ID

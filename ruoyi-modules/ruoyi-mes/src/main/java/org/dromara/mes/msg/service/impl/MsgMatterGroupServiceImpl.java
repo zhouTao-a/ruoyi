@@ -15,7 +15,6 @@ import org.dromara.mes.msg.mapper.MsgMatterGroupMapper;
 import org.dromara.mes.msg.service.IMsgMatterGroupService;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Collection;
 
 /**
@@ -68,7 +67,6 @@ public class MsgMatterGroupServiceImpl implements IMsgMatterGroupService {
     }
 
     private LambdaQueryWrapper<MsgMatterGroup> buildQueryWrapper(MsgMatterGroupBo bo) {
-        Map<String, Object> params = bo.getParams();
         LambdaQueryWrapper<MsgMatterGroup> lqw = Wrappers.lambdaQuery();
         lqw.orderByAsc(MsgMatterGroup::getId);
         lqw.eq(bo.getMatterId() != null, MsgMatterGroup::getMatterId, bo.getMatterId());
@@ -88,6 +86,7 @@ public class MsgMatterGroupServiceImpl implements IMsgMatterGroupService {
         validEntityBeforeSave(add);
         boolean flag = baseMapper.insert(add) > 0;
         if (flag) {
+            assert add != null;
             bo.setId(add.getId());
         }
         return flag;
@@ -110,7 +109,6 @@ public class MsgMatterGroupServiceImpl implements IMsgMatterGroupService {
      * 保存前的数据校验
      */
     private void validEntityBeforeSave(MsgMatterGroup entity){
-        //TODO 做一些数据校验,如唯一约束
     }
 
     /**
@@ -122,9 +120,6 @@ public class MsgMatterGroupServiceImpl implements IMsgMatterGroupService {
      */
     @Override
     public Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid) {
-        if(isValid){
-            //TODO 做一些业务上的校验,判断是否需要校验
-        }
         return baseMapper.deleteByIds(ids) > 0;
     }
 }
