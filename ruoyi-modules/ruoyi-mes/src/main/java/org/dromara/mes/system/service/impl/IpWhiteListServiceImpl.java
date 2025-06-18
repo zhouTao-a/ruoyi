@@ -1,9 +1,11 @@
 package org.dromara.mes.system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
+import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
@@ -16,8 +18,8 @@ import org.dromara.mes.system.service.IIpWhiteListService;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 /**
  * IP白名单Service业务层处理
@@ -71,7 +73,7 @@ public class IpWhiteListServiceImpl implements IIpWhiteListService {
     private LambdaQueryWrapper<IpWhiteList> buildQueryWrapper(IpWhiteListBo bo) {
         LambdaQueryWrapper<IpWhiteList> lqw = Wrappers.lambdaQuery();
         lqw.orderByDesc(IpWhiteList::getUpdateTime);
-        lqw.eq(StringUtils.isNotBlank(bo.getIpAddress()), IpWhiteList::getIpAddress, bo.getIpAddress());
+        lqw.like(StringUtils.isNotBlank(bo.getIpAddress()), IpWhiteList::getIpAddress, bo.getIpAddress());
         lqw.eq(StringUtils.isNotBlank(bo.getDescription()), IpWhiteList::getDescription, bo.getDescription());
         lqw.eq(bo.getStatus() != null, IpWhiteList::getStatus, bo.getStatus());
         lqw.eq(bo.getDeptId() != null, IpWhiteList::getDeptId, bo.getDeptId());
@@ -86,10 +88,11 @@ public class IpWhiteListServiceImpl implements IIpWhiteListService {
      */
     @Override
     public Boolean insertByBo(IpWhiteListBo bo) {
+        validEntityBeforeSave(bo);
         IpWhiteList add = MapstructUtils.convert(bo, IpWhiteList.class);
-        validEntityBeforeSave(add);
         boolean flag = baseMapper.insert(add) > 0;
         if (flag) {
+            assert add != null;
             bo.setId(add.getId());
         }
         return flag;
@@ -103,16 +106,27 @@ public class IpWhiteListServiceImpl implements IIpWhiteListService {
      */
     @Override
     public Boolean updateByBo(IpWhiteListBo bo) {
-        IpWhiteList update = MapstructUtils.convert(bo, IpWhiteList.class);
-        validEntityBeforeSave(update);
-        return baseMapper.updateById(update) > 0;
+        validEntityBeforeSave(bo);
+        LambdaUpdateWrapper<IpWhiteList> update = new LambdaUpdateWrapper<>();
+        update.eq(IpWhiteList::getId, bo.getId())
+            .set(IpWhiteList::getIpAddress, bo.getIpAddress())
+            .set(IpWhiteList::getDescription, bo.getDescription())
+            .set(IpWhiteList::getStatus, bo.getStatus())
+            .set(IpWhiteList::getRemark, bo.getRemark())
+            .set(IpWhiteList::getUpdateTime, new Date());
+        return baseMapper.update(update) > 0;
     }
 
     /**
      * 保存前的数据校验
      */
-    private void validEntityBeforeSave(IpWhiteList entity){
-
+    private void validEntityBeforeSave(IpWhiteListBo entity){
+        List<IpWhiteListVo> ipWhiteListVoList = baseMapper.selectVoList(new LambdaQueryWrapper<IpWhiteList>()
+            .eq(IpWhiteList::getIpAddress, entity.getIpAddress())
+            .ne(entity.getId() != null, IpWhiteList::getId, entity.getId()));
+        if (!ipWhiteListVoList.isEmpty()) {
+            throw new ServiceException("IP地址或CIDR网段已存在!");
+        }
     }
 
     /**
@@ -124,9 +138,6 @@ public class IpWhiteListServiceImpl implements IIpWhiteListService {
      */
     @Override
     public Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid) {
-        if(isValid){
-
-        }
         return baseMapper.deleteByIds(ids) > 0;
     }
 }

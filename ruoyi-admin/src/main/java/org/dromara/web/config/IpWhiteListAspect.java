@@ -58,7 +58,7 @@ public class IpWhiteListAspect {
             ipWhiteList = new IpWhiteList();
             ipWhiteList.setIpAddress(ip);
             ipWhiteList.setStatus(0);
-            ipWhiteList.setDescription("系统自动加入待授权");
+            ipWhiteList.setRemark("系统自动加入待授权");
             ipWhiteListMapper.insert(ipWhiteList);
         }
         throw new SecurityException("IP未授权,请联系后台管理员授权后再次登录！");

@@ -43,7 +43,7 @@ public class MsgUserGroup extends TenantEntity {
     private Long relativeGenerationDiff;
 
     /**
-     * 亲缘关系（close, distant, friend, stranger）
+     * 亲缘关系（spouse, close, distant, friend, stranger）
      */
     private String kinshipLevel;
 

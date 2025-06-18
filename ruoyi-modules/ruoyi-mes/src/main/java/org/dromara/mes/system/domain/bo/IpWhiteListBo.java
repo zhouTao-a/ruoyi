@@ -3,6 +3,7 @@ package org.dromara.mes.system.domain.bo;
 import io.github.linpeilie.annotations.AutoMapper;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.dromara.common.core.validate.AddGroup;
@@ -34,8 +35,9 @@ public class IpWhiteListBo extends BaseEntity {
     private String ipAddress;
 
     /**
-     * 备注说明
+     * 描述
      */
+    @Size(max = 255, message = "描述长度不能超过500个字符")
     private String description;
 
     /**
@@ -51,6 +53,7 @@ public class IpWhiteListBo extends BaseEntity {
     /**
      * 备注
      */
+    @Size(max = 500, message = "备注长度不能超过500个字符")
     private String remark;
 
 

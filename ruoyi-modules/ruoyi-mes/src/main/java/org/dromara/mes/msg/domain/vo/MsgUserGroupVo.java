@@ -74,7 +74,7 @@ public class MsgUserGroupVo implements Serializable {
     private Long relativeGenerationDiff;
 
     /**
-     * 亲缘关系（close, distant, friend, stranger）
+     * 亲缘关系（spouse, close, distant, friend, stranger）
      */
     @ExcelProperty(value = "亲缘关系", converter = ExcelDictConvert.class)
     @ExcelDictFormat(dictType = "kinship_level")

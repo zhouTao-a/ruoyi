@@ -74,10 +74,5 @@ public class MsgDayMatterBo extends BaseEntity {
      */
     private Long userId;
 
-    /**
-     * 所属分组ID
-     */
-    private Long groupId;
-
 
 }

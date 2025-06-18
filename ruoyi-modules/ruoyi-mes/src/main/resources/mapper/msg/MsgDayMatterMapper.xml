@@ -15,16 +15,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             m.notify_status,
             m.next_notify_time,
             m.user_id,
-            m.group_id,
             u.user_name,
             u.user_code,
-            g.group_name,
-            g.group_code
         from mes_msg_day_matter m
         left join mes_msg_user u on m.user_id = u.id and u.deleted_flag = '0'
-        left join mes_msg_group g on m.group_id = g.id and g.deleted_flag = '0'
         <where>
             m.deleted_flag = '0'
+            <if test="param.id != null ">
+                and m.id = #{param.id}
+            </if>
             <if test="param.dayName != null and param.dayName != ''">
                 and day_name like concat('%', #{param.dayName}, '%')
             </if>
@@ -33,9 +32,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             </if>
             <if test="param.userId != null">
                 and m.user_id = #{param.userId}
-            </if>
-            <if test="param.groupId != null">
-                and m.group_id = #{param.groupId}
             </if>
         </where>
         order by m.update_time desc

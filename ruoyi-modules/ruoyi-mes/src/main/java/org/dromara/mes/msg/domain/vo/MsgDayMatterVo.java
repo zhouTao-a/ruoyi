@@ -89,7 +89,7 @@ public class MsgDayMatterVo implements Serializable {
     /**
      * 所属分组ID
      */
-    private Long groupId;
+    private String groupId;
 
     /**
      * 用户名

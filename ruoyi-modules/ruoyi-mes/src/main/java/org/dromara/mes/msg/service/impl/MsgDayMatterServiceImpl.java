@@ -102,7 +102,6 @@ public class MsgDayMatterServiceImpl implements IMsgDayMatterService {
             .set(MsgDayMatter::getRepeatFlag, bo.getRepeatFlag())
             .set(MsgDayMatter::getNotifyStatus, bo.getNotifyStatus())
             .set(MsgDayMatter::getUserId, bo.getUserId())
-            .set(MsgDayMatter::getGroupId, bo.getGroupId())
             .set(MsgDayMatter::getUpdateTime, new Date());
         return baseMapper.update(updateWrapper) > 0;
     }

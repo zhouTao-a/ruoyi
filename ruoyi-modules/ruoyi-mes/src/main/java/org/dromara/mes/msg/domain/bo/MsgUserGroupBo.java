@@ -47,9 +47,9 @@ public class MsgUserGroupBo extends BaseEntity {
     private Long relativeGenerationDiff;
 
     /**
-     * 亲缘关系（close, distant, friend, stranger）
+     * 亲缘关系（spouse, close, distant, friend, stranger）
      */
-    @NotBlank(message = "亲缘关系（close, distant, friend, stranger）不能为空", groups = { AddGroup.class, EditGroup.class })
+    @NotBlank(message = "亲缘关系不能为空", groups = { AddGroup.class, EditGroup.class })
     private String kinshipLevel;
 
     /**
