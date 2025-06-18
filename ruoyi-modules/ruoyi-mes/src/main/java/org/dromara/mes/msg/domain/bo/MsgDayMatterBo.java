@@ -9,7 +9,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import jakarta.validation.constraints.*;
 import java.util.Date;
-import com.fasterxml.jackson.annotation.JsonFormat;
+import java.util.List;
 
 /**
  * 事件业务对象 mes_msg_day_matter
@@ -73,6 +73,11 @@ public class MsgDayMatterBo extends BaseEntity {
      * 所属用户ID
      */
     private Long userId;
+
+    /**
+     * 分组ID
+     */
+    private List<Long> groupId;
 
 
 }

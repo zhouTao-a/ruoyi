@@ -1,7 +1,7 @@
 package org.dromara.mes.msg.domain.vo;
 
 import java.util.Date;
-import com.fasterxml.jackson.annotation.JsonFormat;
+
 import org.dromara.mes.msg.domain.MsgDayMatter;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
@@ -12,8 +12,7 @@ import lombok.Data;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Date;
-
+import java.util.List;
 
 
 /**
@@ -89,7 +88,7 @@ public class MsgDayMatterVo implements Serializable {
     /**
      * 所属分组ID
      */
-    private String groupId;
+    private List<Long> groupId;
 
     /**
      * 用户名
