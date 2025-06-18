@@ -52,8 +52,7 @@ public class MsgUserServiceImpl implements IMsgUserService {
      */
     @Override
     public TableDataInfo<MsgUserVo> queryPageList(MsgUserBo bo, PageQuery pageQuery) {
-        LambdaQueryWrapper<MsgUser> lqw = buildQueryWrapper(bo);
-        Page<MsgUserVo> result = baseMapper.selectVoPage(pageQuery.build(), lqw);
+        Page<MsgUserVo> result = baseMapper.queryPageList(pageQuery.build(), bo);
         return TableDataInfo.build(result);
     }
 
@@ -116,6 +115,9 @@ public class MsgUserServiceImpl implements IMsgUserService {
             .set(MsgUser::getSmsNotifyFlag, bo.getSmsNotifyFlag())
             .set(MsgUser::getUserCode, bo.getUserCode())
             .set(MsgUser::getUserName, bo.getUserName())
+            .set(MsgUser::getFatherId, bo.getFatherId())
+            .set(MsgUser::getMotherId, bo.getMotherId())
+            .set(MsgUser::getSpouseId, bo.getSpouseId())
             .set(MsgUser::getUpdateTime, new Date());
         return baseMapper.update(updateWrapper) > 0;
     }

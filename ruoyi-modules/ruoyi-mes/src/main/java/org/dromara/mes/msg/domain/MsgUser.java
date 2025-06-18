@@ -85,5 +85,19 @@ public class MsgUser extends TenantEntity {
     @TableLogic
     private String deletedFlag;
 
+    /**
+     * 父级ID
+     */
+    private Long fatherId;
+
+    /**
+     * 母亲ID
+     */
+    private Long motherId;
+
+    /**
+     * 配偶ID
+     */
+    private Long spouseId;
 
 }

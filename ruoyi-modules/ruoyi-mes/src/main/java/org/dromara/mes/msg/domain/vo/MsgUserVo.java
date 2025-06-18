@@ -43,17 +43,17 @@ public class MsgUserVo implements Serializable {
     private String userName;
 
     /**
+     * 用户编码
+     */
+    @ExcelProperty(value = "用户编码")
+    private String userCode;
+
+    /**
      * 性别
      */
     @ExcelProperty(value = "性别", converter = ExcelDictConvert.class)
     @ExcelDictFormat(dictType = "sys_user_sex")
     private String gender;
-
-    /**
-     * 用户编码
-     */
-    @ExcelProperty(value = "用户编码")
-    private String userCode;
 
     /**
      * 身份证号
@@ -100,6 +100,51 @@ public class MsgUserVo implements Serializable {
     @ExcelProperty(value = "邮箱通知", converter = ExcelDictConvert.class)
     @ExcelDictFormat(dictType = "whether_flag")
     private String emailNotifyFlag;
+
+    /**
+     * 父级ID
+     */
+    private Long fatherId;
+
+    /**
+     * 父级名称
+     */
+    private String fatherName;
+
+    /**
+     * 父级编码
+     */
+    private String fatherCode;
+
+    /**
+     * 母亲ID
+     */
+    private Long motherId;
+
+    /**
+     * 母亲名称
+     */
+    private String motherName;
+
+    /**
+     * 母亲编码
+     */
+    private String motherCode;
+
+    /**
+     * 配偶ID
+     */
+    private Long spouseId;
+
+    /**
+     * 配偶名称
+     */
+    private String spouseName;
+
+    /**
+     * 配偶编码
+     */
+    private String spouseCode;
 
 
 }

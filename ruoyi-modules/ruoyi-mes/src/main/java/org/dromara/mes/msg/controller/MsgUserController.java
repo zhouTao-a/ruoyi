@@ -65,7 +65,7 @@ public class MsgUserController extends BaseController {
     @Log(title = "用户", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     public void export(MsgUserBo bo, HttpServletResponse response) {
-        List<MsgUserVo> list = msgUserService.queryList(bo);
+        List<MsgUserVo> list = msgUserService.queryPageList(bo, new PageQuery()).getRows();
         excelExportWrapper.exportWithSensitiveHandle(list, "用户", MsgUserVo.class, response);
     }
 
@@ -78,7 +78,10 @@ public class MsgUserController extends BaseController {
     @GetMapping("/{id}")
     public R<MsgUserVo> getInfo(@NotNull(message = "主键不能为空")
                                      @PathVariable Long id) {
-        return R.ok(msgUserService.queryById(id));
+        MsgUserBo bo = new MsgUserBo();
+        bo.setId(id);
+        List<MsgUserVo> list = msgUserService.queryPageList(bo, new PageQuery(1, 1)).getRows();
+        return list.isEmpty() ? R.fail("数据不存在") : R.ok(list.get(0));
     }
 
     /**

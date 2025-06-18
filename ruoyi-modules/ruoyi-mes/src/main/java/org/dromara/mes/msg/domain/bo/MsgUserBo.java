@@ -89,5 +89,20 @@ public class MsgUserBo extends BaseEntity {
      */
     private String emailNotifyFlag;
 
+    /**
+     * 父级ID
+     */
+    private Long fatherId;
+
+    /**
+     * 母亲ID
+     */
+    private Long motherId;
+
+    /**
+     * 配偶ID
+     */
+    private Long spouseId;
+
 
 }

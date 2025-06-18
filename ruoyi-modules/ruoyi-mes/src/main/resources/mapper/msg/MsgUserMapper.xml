@@ -19,4 +19,47 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             </if>
         </where>
     </select>
+    <select id="queryPageList" resultType="org.dromara.mes.msg.domain.vo.MsgUserVo">
+        select
+            u.id,
+            u.user_name,
+            u.user_code,
+            u.gender,
+            u.id_card,
+            u.phone_number,
+            u.birthday,
+            u.lunar_birthday,
+            u.email,
+            u.sms_notify_flag,
+            u.email_notify_flag,
+            u.father_id,
+            f.user_name as fatherName,
+            f.user_code as fatherCode,
+            u.mother_id,
+            m.user_name as motherName,
+            m.user_code as motherCode,
+            u.spouse_id,
+            s.user_name as spouseName,
+            s.user_code as spouseCode
+        from mes_msg_user u
+        left join mes_msg_user f on u.father_id = f.id and f.deleted_flag = '0'
+        left join mes_msg_user m on u.mother_id = m.id and m.deleted_flag = '0'
+        left join mes_msg_user s on u.spouse_id = s.id and s.deleted_flag = '0'
+        <where>
+            u.deleted_flag = '0'
+            <if test="param.id != null ">
+                and u.id = #{param.id}
+            </if>
+            <if test="param.userName != null and param.userName != ''">
+                and u.user_name like concat('%', #{param.userName}, '%')
+            </if>
+            <if test="param.userCode != null and param.userCode != ''">
+                and u.user_code like concat('%', #{param.userCode}, '%')
+            </if>
+            <if test="param.phoneNumber != null and param.phoneNumber != ''">
+                and u.phone_number like concat('%', #{param.phoneNumber}, '%')
+            </if>
+        </where>
+        order by u.update_time desc
+    </select>
 </mapper>
