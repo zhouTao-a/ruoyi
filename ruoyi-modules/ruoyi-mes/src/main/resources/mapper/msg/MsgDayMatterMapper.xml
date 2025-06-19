@@ -36,4 +36,17 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </where>
         order by m.next_notify_time desc
     </select>
+
+    <select id="queryDayNameList" resultType="org.dromara.mes.msg.domain.vo.MsgDayMatterNameVo">
+        select id, day_name
+        from mes_msg_day_matter
+        where deleted_flag = '0'
+        <if test="dayName != null and dayName != ''">
+            and day_name like concat('%', #{dayName}, '%')
+        </if>
+        <if test="id != null">
+            and id != #{id}
+        </if>
+        order by next_notify_time desc
+    </select>
 </mapper>

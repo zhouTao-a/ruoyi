@@ -1,5 +1,6 @@
 package org.dromara.mes.msg.service;
 
+import org.dromara.mes.msg.domain.vo.MsgDayMatterNameVo;
 import org.dromara.mes.msg.domain.vo.MsgDayMatterVo;
 import org.dromara.mes.msg.domain.bo.MsgDayMatterBo;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
@@ -65,4 +66,13 @@ public interface IMsgDayMatterService {
      * @return 是否删除成功
      */
     Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid);
+
+    /**
+     * 查询事件名称列表
+     *
+     * @param dayName 事件名称
+     * @param id      主键
+     * @return 事件名称列表
+     */
+    List<MsgDayMatterNameVo> queryDayNameList(String dayName, String id, PageQuery pageQuery);
 }

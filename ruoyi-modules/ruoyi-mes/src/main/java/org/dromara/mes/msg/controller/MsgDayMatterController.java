@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.*;
 import cn.dev33.satoken.annotation.SaCheckPermission;
+import org.dromara.mes.msg.domain.vo.MsgDayMatterNameVo;
 import org.dromara.mes.system.excel.ExcelExportWrapper;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.validation.annotation.Validated;
@@ -44,6 +45,17 @@ public class MsgDayMatterController extends BaseController {
     @GetMapping("/list")
     public TableDataInfo<MsgDayMatterVo> list(MsgDayMatterBo bo, PageQuery pageQuery) {
         return msgDayMatterService.queryPageList(bo, pageQuery);
+    }
+
+    /**
+     * 查询事件
+     */
+    @SaCheckPermission("msg:msgDayMatter:list")
+    @GetMapping("/dayNameList")
+    public R<List<MsgDayMatterNameVo>> dayNameList(@RequestParam(required = false) String dayName,
+                                                   @RequestParam(required = false) String id,
+                                                   PageQuery pageQuery) {
+        return R.ok(msgDayMatterService.queryDayNameList(dayName, id, pageQuery));
     }
 
     /**

@@ -8,6 +8,7 @@ import org.dromara.common.mybatis.core.page.PageQuery;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.RequiredArgsConstructor;
+import org.dromara.mes.msg.domain.vo.MsgDayMatterNameVo;
 import org.springframework.stereotype.Service;
 import org.dromara.mes.msg.domain.bo.MsgDayMatterBo;
 import org.dromara.mes.msg.domain.vo.MsgDayMatterVo;
@@ -130,5 +131,10 @@ public class MsgDayMatterServiceImpl implements IMsgDayMatterService {
     @Override
     public Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid) {
         return baseMapper.deleteByIds(ids) > 0;
+    }
+
+    @Override
+    public List<MsgDayMatterNameVo> queryDayNameList(String dayName, String id, PageQuery pageQuery) {
+        return baseMapper.queryDayNameList(pageQuery.build(), dayName, id);
     }
 }
