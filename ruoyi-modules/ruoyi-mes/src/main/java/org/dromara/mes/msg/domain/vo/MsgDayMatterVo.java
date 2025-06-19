@@ -42,7 +42,7 @@ public class MsgDayMatterVo implements Serializable {
     /**
      * 事件时间
      */
-    @ExcelProperty(value = "事件时间", converter = ExcelDictConvert.class)
+    @ExcelProperty(value = "事件时间")
     private Date dayTarget;
 
     /**
@@ -76,7 +76,7 @@ public class MsgDayMatterVo implements Serializable {
     /**
      * 下次通知时间
      */
-    @ExcelProperty(value = "下次通知时间")
+    @ExcelProperty(value = "通知时间")
     private Date nextNotifyTime;
 
     /**

@@ -3,15 +3,11 @@ package org.dromara.mes.msg.domain.vo;
 import org.dromara.mes.msg.domain.MsgUserGroup;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
-import org.dromara.common.excel.annotation.ExcelDictFormat;
-import org.dromara.common.excel.convert.ExcelDictConvert;
 import io.github.linpeilie.annotations.AutoMapper;
 import lombok.Data;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Date;
-
 
 
 /**
@@ -70,13 +66,10 @@ public class MsgUserGroupVo implements Serializable {
     /**
      * 辈分差
      */
-    @ExcelProperty(value = "辈分差")
     private Long relativeGenerationDiff;
 
     /**
      * 亲缘关系（spouse, close, distant, friend, stranger）
      */
-    @ExcelProperty(value = "亲缘关系", converter = ExcelDictConvert.class)
-    @ExcelDictFormat(dictType = "kinship_level")
     private String kinshipLevel;
 }

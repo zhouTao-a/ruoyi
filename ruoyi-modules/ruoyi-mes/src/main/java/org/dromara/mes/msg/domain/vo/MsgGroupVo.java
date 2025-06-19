@@ -3,15 +3,11 @@ package org.dromara.mes.msg.domain.vo;
 import org.dromara.mes.msg.domain.MsgGroup;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
-import org.dromara.common.excel.annotation.ExcelDictFormat;
-import org.dromara.common.excel.convert.ExcelDictConvert;
 import io.github.linpeilie.annotations.AutoMapper;
 import lombok.Data;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Date;
-
 
 
 /**
@@ -53,13 +49,11 @@ public class MsgGroupVo implements Serializable {
     /**
      * 默认参考用户代码
      */
-    @ExcelProperty(value = "参考用户代码")
     private String defaultTargetUserCode;
 
     /**
      * 默认参考用户名称
      */
-    @ExcelProperty(value = "参考用户名称")
     private String defaultTargetUserName;
 
 

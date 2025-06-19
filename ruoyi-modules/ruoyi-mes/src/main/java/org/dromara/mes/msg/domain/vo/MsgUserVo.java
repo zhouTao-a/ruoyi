@@ -56,6 +56,42 @@ public class MsgUserVo implements Serializable {
     private String gender;
 
     /**
+     * 父亲
+     */
+    @ExcelProperty(value = "父亲")
+    private String fatherName;
+
+    /**
+     * 父亲编码
+     */
+    @ExcelProperty(value = "父亲编码")
+    private String fatherCode;
+
+    /**
+     * 母亲名称
+     */
+    @ExcelProperty(value = "母亲")
+    private String motherName;
+
+    /**
+     * 母亲编码
+     */
+    @ExcelProperty(value = "母亲编码")
+    private String motherCode;
+
+    /**
+     * 配偶名称
+     */
+    @ExcelProperty(value = "配偶")
+    private String spouseName;
+
+    /**
+     * 配偶编码
+     */
+    @ExcelProperty(value = "配偶编码")
+    private String spouseCode;
+
+    /**
      * 身份证号
      */
     @ExcelProperty(value = "身份证号")
@@ -90,8 +126,6 @@ public class MsgUserVo implements Serializable {
     /**
      * 短信通知
      */
-    @ExcelProperty(value = "短信通知", converter = ExcelDictConvert.class)
-    @ExcelDictFormat(dictType = "whether_flag")
     private String smsNotifyFlag;
 
     /**
@@ -107,44 +141,14 @@ public class MsgUserVo implements Serializable {
     private Long fatherId;
 
     /**
-     * 父级名称
-     */
-    private String fatherName;
-
-    /**
-     * 父级编码
-     */
-    private String fatherCode;
-
-    /**
      * 母亲ID
      */
     private Long motherId;
 
     /**
-     * 母亲名称
-     */
-    private String motherName;
-
-    /**
-     * 母亲编码
-     */
-    private String motherCode;
-
-    /**
      * 配偶ID
      */
     private Long spouseId;
-
-    /**
-     * 配偶名称
-     */
-    private String spouseName;
-
-    /**
-     * 配偶编码
-     */
-    private String spouseCode;
 
 
 }
