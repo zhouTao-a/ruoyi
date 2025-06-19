@@ -9,6 +9,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import jakarta.validation.constraints.*;
 
+import java.util.List;
+
 /**
  * 用户组业务对象 mes_msg_user_group
  *
@@ -29,8 +31,13 @@ public class MsgUserGroupBo extends BaseEntity {
     /**
      * 用户ID
      */
-    @NotNull(message = "用户ID不能为空", groups = { AddGroup.class, EditGroup.class })
     private Long userId;
+
+    /**
+     * 用户ID
+     */
+    @NotNull(message = "用户ID不能为空", groups = { AddGroup.class, EditGroup.class })
+    private List<String> userIdList;
 
     /**
      * 分组ID
@@ -41,15 +48,13 @@ public class MsgUserGroupBo extends BaseEntity {
     /**
      * 辈分差
      */
-    @NotNull(message = "辈分差不能为空", groups = { AddGroup.class, EditGroup.class })
     @Min(value = -100, message = "辈分差不能小于-100", groups = { AddGroup.class, EditGroup.class })
     @Max(value = 100, message = "辈分差不能大于100", groups = { AddGroup.class, EditGroup.class })
-    private Long relativeGenerationDiff;
+    private Long relativeGenerationDiff = 0L;
 
     /**
      * 亲缘关系（spouse, close, distant, friend, stranger）
      */
-    @NotBlank(message = "亲缘关系不能为空", groups = { AddGroup.class, EditGroup.class })
     private String kinshipLevel;
 
     /**

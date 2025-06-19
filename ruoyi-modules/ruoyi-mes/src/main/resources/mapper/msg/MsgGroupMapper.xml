@@ -13,10 +13,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         u.user_code as default_target_user_code,
         u.user_name as default_target_user_name
         from mes_msg_group g
-        inner join mes_msg_user u on g.default_target_user_id = u.id
+        left join mes_msg_user u on g.default_target_user_id = u.id and u.deleted_flag = '0'
         <where>
             g.deleted_flag = '0'
-            and u.deleted_flag = '0'
             <if test="param.groupName != null and param.groupName != ''">
                 and g.group_name like concat('%', #{param.groupName}, '%')
             </if>

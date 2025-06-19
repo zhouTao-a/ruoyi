@@ -4,8 +4,8 @@ import org.dromara.common.tenant.core.TenantEntity;
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
 import java.util.Date;
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.io.Serial;
 

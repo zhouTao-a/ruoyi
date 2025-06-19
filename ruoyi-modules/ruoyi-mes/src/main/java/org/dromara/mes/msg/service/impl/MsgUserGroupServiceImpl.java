@@ -2,8 +2,6 @@ package org.dromara.mes.msg.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import org.dromara.common.core.exception.ServiceException;
-import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -15,6 +13,7 @@ import org.dromara.mes.msg.domain.MsgUserGroup;
 import org.dromara.mes.msg.mapper.MsgUserGroupMapper;
 import org.dromara.mes.msg.service.IMsgUserGroupService;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Collection;
@@ -75,14 +74,21 @@ public class MsgUserGroupServiceImpl implements IMsgUserGroupService {
      */
     @Override
     public Boolean insertByBo(MsgUserGroupBo bo) {
-        validEntityBeforeSave(bo);
-        MsgUserGroup add = MapstructUtils.convert(bo, MsgUserGroup.class);
-        assert add != null;
-        boolean flag = baseMapper.insert(add) > 0;
-        if (flag) {
-            bo.setId(add.getId());
+        List<String> userIdList = bo.getUserIdList();
+        List<MsgUserGroup> msgUserGroupList = new ArrayList<>();
+        if (userIdList != null && !userIdList.isEmpty()) {
+            for (String userId : userIdList) {
+                MsgUserGroup msgUserGroup = new MsgUserGroup();
+                msgUserGroup.setUserId(Long.parseLong(userId));
+                msgUserGroup.setGroupId(bo.getGroupId());
+                msgUserGroup.setRelativeGenerationDiff(bo.getRelativeGenerationDiff());
+                msgUserGroup.setKinshipLevel(bo.getKinshipLevel());
+                if (validEntityBeforeSave(msgUserGroup)) {
+                    msgUserGroupList.add(msgUserGroup);
+                }
+            }
         }
-        return flag;
+        return msgUserGroupList.isEmpty() || baseMapper.insertBatch(msgUserGroupList);
     }
 
     /**
@@ -93,33 +99,39 @@ public class MsgUserGroupServiceImpl implements IMsgUserGroupService {
      */
     @Override
     public Boolean updateByBo(MsgUserGroupBo bo) {
-        List<MsgUserGroupVo> msgUserGroupList = baseMapper.selectVoList(new LambdaQueryWrapper<MsgUserGroup>()
-            .eq(MsgUserGroup::getUserId, bo.getUserId())
-            .eq(MsgUserGroup::getGroupId, bo.getGroupId())
-            .ne(MsgUserGroup::getId, bo.getId()));
-        if (!msgUserGroupList.isEmpty()) {
-            throw new ServiceException("用户组已存在!");
+        List<String> userIdList = bo.getUserIdList();
+        if (userIdList != null && !userIdList.isEmpty()) {
+            for (String userId : userIdList) {
+                MsgUserGroup msgUserGroup = new MsgUserGroup();
+                msgUserGroup.setId(bo.getId());
+                msgUserGroup.setUserId(Long.parseLong(userId));
+                msgUserGroup.setGroupId(bo.getGroupId());
+                msgUserGroup.setRelativeGenerationDiff(bo.getRelativeGenerationDiff());
+                msgUserGroup.setKinshipLevel(bo.getKinshipLevel());
+                if (validEntityBeforeSave(msgUserGroup)) {
+                    LambdaUpdateWrapper<MsgUserGroup> updateWrapper = new LambdaUpdateWrapper<>();
+                    updateWrapper.eq(MsgUserGroup::getId, bo.getId());
+                    updateWrapper.set(MsgUserGroup::getUserId, Long.parseLong(userId));
+                    updateWrapper.set(MsgUserGroup::getGroupId, bo.getGroupId());
+                    updateWrapper.set(MsgUserGroup::getRelativeGenerationDiff, bo.getRelativeGenerationDiff());
+                    updateWrapper.set(MsgUserGroup::getKinshipLevel, bo.getKinshipLevel());
+                    updateWrapper.set(MsgUserGroup::getUpdateTime, new Date());
+                    baseMapper.update(updateWrapper);
+                }
+            }
         }
-        LambdaUpdateWrapper<MsgUserGroup> updateWrapper = new LambdaUpdateWrapper<>();
-        updateWrapper.eq(MsgUserGroup::getId, bo.getId());
-        updateWrapper.set(MsgUserGroup::getUserId, bo.getUserId());
-        updateWrapper.set(MsgUserGroup::getRelativeGenerationDiff, bo.getRelativeGenerationDiff());
-        updateWrapper.set(MsgUserGroup::getKinshipLevel, bo.getKinshipLevel());
-        updateWrapper.set(MsgUserGroup::getUpdateTime, new Date());
-        return baseMapper.update(updateWrapper) > 0;
+        return true;
     }
 
     /**
      * 保存前的数据校验
      */
-    private void validEntityBeforeSave(MsgUserGroupBo entity){
+    private boolean validEntityBeforeSave(MsgUserGroup entity){
         List<MsgUserGroupVo> msgUserGroupList = baseMapper.selectVoList(new LambdaQueryWrapper<MsgUserGroup>()
             .eq(MsgUserGroup::getUserId, entity.getUserId())
             .eq(MsgUserGroup::getGroupId, entity.getGroupId())
             .ne(entity.getId() != null, MsgUserGroup::getId, entity.getId()));
-        if (!msgUserGroupList.isEmpty()) {
-            throw new ServiceException("用户组已存在!");
-        }
+        return msgUserGroupList.isEmpty();
     }
 
     /**

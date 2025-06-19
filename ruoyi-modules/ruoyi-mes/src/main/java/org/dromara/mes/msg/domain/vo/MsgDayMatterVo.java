@@ -12,7 +12,6 @@ import lombok.Data;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.List;
 
 
 /**
@@ -86,11 +85,6 @@ public class MsgDayMatterVo implements Serializable {
     private Long userId;
 
     /**
-     * 所属分组ID
-     */
-    private List<Long> groupId;
-
-    /**
      * 用户名
      */
     @ExcelProperty(value = "用户名称")
@@ -101,18 +95,4 @@ public class MsgDayMatterVo implements Serializable {
      */
     @ExcelProperty(value = "用户编码")
     private String userCode;
-
-    /**
-     * 分组名称
-     */
-    @ExcelProperty(value = "分组名称")
-    private String groupName;
-
-    /**
-     * 分组编码
-     */
-    @ExcelProperty(value = "分组编码")
-    private String groupCode;
-
-
 }

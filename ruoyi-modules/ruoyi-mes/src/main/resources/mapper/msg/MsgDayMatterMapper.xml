@@ -25,15 +25,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                 and m.id = #{param.id}
             </if>
             <if test="param.dayName != null and param.dayName != ''">
-                and day_name like concat('%', #{param.dayName}, '%')
+                and m.day_name like concat('%', #{param.dayName}, '%')
             </if>
             <if test="param.dayType != null and param.dayType != ''">
-                and day_type = #{param.dayType}
+                and m.day_type = #{param.dayType}
             </if>
             <if test="param.userId != null">
                 and m.user_id = #{param.userId}
             </if>
         </where>
-        order by m.update_time desc
+        order by m.next_notify_time desc
     </select>
 </mapper>

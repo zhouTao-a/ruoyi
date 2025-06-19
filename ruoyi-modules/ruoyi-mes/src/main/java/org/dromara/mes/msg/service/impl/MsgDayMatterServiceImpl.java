@@ -101,6 +101,7 @@ public class MsgDayMatterServiceImpl implements IMsgDayMatterService {
             .set(MsgDayMatter::getRemindType, bo.getRemindType())
             .set(MsgDayMatter::getRepeatFlag, bo.getRepeatFlag())
             .set(MsgDayMatter::getNotifyStatus, bo.getNotifyStatus())
+            .set(MsgDayMatter::getNextNotifyTime, bo.getNextNotifyTime())
             .set(MsgDayMatter::getUserId, bo.getUserId())
             .set(MsgDayMatter::getUpdateTime, new Date());
         return baseMapper.update(updateWrapper) > 0;
@@ -116,7 +117,7 @@ public class MsgDayMatterServiceImpl implements IMsgDayMatterService {
         if (!msgDayMatterVoList.isEmpty()) {
             throw new ServiceException("事件名称不能重复!");
         }
-        //TODO 对下次执行时间设值
+        entity.calculateNextNotifyTime();
     }
 
     /**
