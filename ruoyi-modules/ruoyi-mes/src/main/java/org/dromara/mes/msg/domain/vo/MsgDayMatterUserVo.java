@@ -3,15 +3,11 @@ package org.dromara.mes.msg.domain.vo;
 import org.dromara.mes.msg.domain.MsgDayMatterUser;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
-import org.dromara.common.excel.annotation.ExcelDictFormat;
-import org.dromara.common.excel.convert.ExcelDictConvert;
 import io.github.linpeilie.annotations.AutoMapper;
 import lombok.Data;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Date;
-
 
 
 /**
@@ -31,20 +27,35 @@ public class MsgDayMatterUserVo implements Serializable {
     /**
      * 主键ID
      */
-    @ExcelProperty(value = "主键ID")
     private Long id;
 
     /**
      * 事件ID
      */
-    @ExcelProperty(value = "事件ID")
     private Long dayMatterId;
 
     /**
      * 用户ID
      */
-    @ExcelProperty(value = "用户ID")
     private Long userId;
+
+    /**
+     * 用户名
+     */
+    @ExcelProperty(value = "用户名称")
+    private String userName;
+
+    /**
+     * 用户编码
+     */
+    @ExcelProperty(value = "用户编码")
+    private String userCode;
+
+    /**
+     * 事件名称
+     */
+    @ExcelProperty(value = "事件名称")
+    private String dayName;
 
 
 }

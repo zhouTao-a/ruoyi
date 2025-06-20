@@ -13,10 +13,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             r.user_name,
             r.user_code
         from mes_msg_day_matter_user u
-        left join mes_msg_day_matter m on u.day_matter_id = m.id on m.deleted_flag = '0'
-        left join mes_msg_user r on u.user_id = r.id on r.deleted_flag = '0'
+        left join mes_msg_day_matter m on u.day_matter_id = m.id and m.deleted_flag = '0'
+        left join mes_msg_user r on u.user_id = r.id and r.deleted_flag = '0'
         <where>
             u.deleted_flag = '0'
+            <if test="param.id != null">
+                and u.id = #{param.id}
+            </if>
             <if test="param.userId != null">
                 and u.user_id = #{param.userId}
             </if>
