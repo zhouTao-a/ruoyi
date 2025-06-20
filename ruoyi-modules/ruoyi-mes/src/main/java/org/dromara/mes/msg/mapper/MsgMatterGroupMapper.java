@@ -1,5 +1,6 @@
 package org.dromara.mes.msg.mapper;
 
+import org.apache.ibatis.annotations.Mapper;
 import org.dromara.mes.msg.domain.MsgMatterGroup;
 import org.dromara.mes.msg.domain.vo.MsgMatterGroupVo;
 import org.dromara.common.mybatis.core.mapper.BaseMapperPlus;
@@ -10,6 +11,7 @@ import org.dromara.common.mybatis.core.mapper.BaseMapperPlus;
  * @author allen
  * @date 2025-06-18
  */
+@Mapper
 public interface MsgMatterGroupMapper extends BaseMapperPlus<MsgMatterGroup, MsgMatterGroupVo> {
 
 }

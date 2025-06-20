@@ -1,6 +1,7 @@
 package org.dromara.mes.msg.mapper;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.dromara.mes.msg.domain.MsgUser;
 import org.dromara.mes.msg.domain.bo.MsgUserBo;
@@ -14,6 +15,7 @@ import org.dromara.common.mybatis.core.mapper.BaseMapperPlus;
  * @author zhout
  * @date 2025-06-08
  */
+@Mapper
 public interface MsgUserMapper extends BaseMapperPlus<MsgUser, MsgUserVo> {
 
     /**
