@@ -10,12 +10,12 @@ public enum RemindTypeEnum {
     /**
      * 每分钟提醒
      */
-    MINUTELY("minutely", "每分钟"),
+    MINUTELY("minutely", "每分"),
 
     /**
      * 每小时提醒
      */
-    HOURLY("hourly", "每小时"),
+    HOURLY("hourly", "每时"),
 
     /**
      * 每天提醒
@@ -68,16 +68,5 @@ public enum RemindTypeEnum {
             }
         }
         throw new IllegalArgumentException("无效的提醒周期 code: " + code);
-    }
-
-    /**
-     * 根据 name（如 "DAILY"）获取枚举对象
-     */
-    public static RemindTypeEnum fromName(String name) {
-        try {
-            return RemindTypeEnum.valueOf(name.toUpperCase());
-        } catch (Exception e) {
-            throw new IllegalArgumentException("无效的提醒周期 name: " + name);
-        }
     }
 }

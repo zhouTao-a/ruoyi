@@ -45,6 +45,14 @@ public class MsgDayMatterVo implements Serializable {
     @ExcelProperty(value = "事件时间")
     private Date dayTarget;
 
+
+    /**
+     *  时间类型（solar-公历, lunar-农历）
+     */
+    @ExcelProperty(value = "时间类型", converter = ExcelDictConvert.class)
+    @ExcelDictFormat(dictType = "day_lunar")
+    private String dayLunar;
+
     /**
      * 事件类型（life, work, anniversary, birthday）
      */

@@ -40,6 +40,11 @@ public class MsgDayMatter extends TenantEntity {
     private Date dayTarget;
 
     /**
+     *  时间类型（solar-公历, lunar-农历）
+     */
+    private String dayLunar;
+
+    /**
      * 事件类型（life, work, anniversary, birthday）
      */
     private String dayType;

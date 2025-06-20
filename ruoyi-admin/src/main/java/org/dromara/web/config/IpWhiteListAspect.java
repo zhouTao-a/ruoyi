@@ -3,14 +3,13 @@ package org.dromara.web.config;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
-import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.dromara.common.redis.utils.RedisUtils;
 import org.dromara.mes.system.domain.IpWhiteList;
 import org.dromara.mes.system.mapper.IpWhiteListMapper;
-import org.dromara.mes.system.utils.IpUtils;
+import org.dromara.mes.utils.IpUtils;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
@@ -32,7 +31,7 @@ public class IpWhiteListAspect {
     public void checkIpWhiteList() {}
 
     @Before("checkIpWhiteList()")
-    public void doBefore(JoinPoint joinPoint) throws Throwable {
+    public void doBefore() {
         String ip = IpUtils.getIpAddr(request);
 
         // 判断是否是内网IP，如果是就直接放行

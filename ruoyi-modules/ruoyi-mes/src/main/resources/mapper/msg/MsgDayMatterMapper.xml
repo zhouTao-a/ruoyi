@@ -9,6 +9,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             m.id,
             m.day_name,
             m.day_target,
+            m.day_lunar,
             m.day_type,
             m.remind_type,
             m.repeat_flag,
@@ -34,7 +35,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                 and m.user_id = #{param.userId}
             </if>
         </where>
-        order by m.next_notify_time desc
+        order by m.next_notify_time asc
     </select>
 
     <select id="queryDayNameList" resultType="org.dromara.mes.msg.domain.vo.MsgDayMatterNameVo">

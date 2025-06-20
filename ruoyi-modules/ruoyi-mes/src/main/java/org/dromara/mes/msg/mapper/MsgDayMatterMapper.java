@@ -1,6 +1,7 @@
 package org.dromara.mes.msg.mapper;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.dromara.mes.msg.domain.MsgDayMatter;
 import org.dromara.mes.msg.domain.bo.MsgDayMatterBo;
@@ -16,6 +17,7 @@ import java.util.List;
  * @author zhout
  * @date 2025-06-08
  */
+@Mapper
 public interface MsgDayMatterMapper extends BaseMapperPlus<MsgDayMatter, MsgDayMatterVo> {
 
     /**

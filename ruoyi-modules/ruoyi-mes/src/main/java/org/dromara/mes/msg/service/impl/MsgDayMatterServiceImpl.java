@@ -98,6 +98,7 @@ public class MsgDayMatterServiceImpl implements IMsgDayMatterService {
         updateWrapper.eq(MsgDayMatter::getId, bo.getId())
             .set(MsgDayMatter::getDayName, bo.getDayName())
             .set(MsgDayMatter::getDayTarget, bo.getDayTarget())
+            .set(MsgDayMatter::getDayLunar, bo.getDayLunar())
             .set(MsgDayMatter::getDayType, bo.getDayType())
             .set(MsgDayMatter::getRemindType, bo.getRemindType())
             .set(MsgDayMatter::getRepeatFlag, bo.getRepeatFlag())
