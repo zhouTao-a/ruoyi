@@ -1,11 +1,10 @@
 package org.dromara.mes.msg.service.impl;
 
-import org.dromara.common.core.utils.MapstructUtils;
+import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.dromara.mes.msg.domain.bo.MsgMatterGroupBo;
@@ -14,6 +13,7 @@ import org.dromara.mes.msg.domain.MsgMatterGroup;
 import org.dromara.mes.msg.mapper.MsgMatterGroupMapper;
 import org.dromara.mes.msg.service.IMsgMatterGroupService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Collection;
 
@@ -49,8 +49,7 @@ public class MsgMatterGroupServiceImpl implements IMsgMatterGroupService {
      */
     @Override
     public TableDataInfo<MsgMatterGroupVo> queryPageList(MsgMatterGroupBo bo, PageQuery pageQuery) {
-        LambdaQueryWrapper<MsgMatterGroup> lqw = buildQueryWrapper(bo);
-        Page<MsgMatterGroupVo> result = baseMapper.selectVoPage(pageQuery.build(), lqw);
+        Page<MsgMatterGroupVo> result = baseMapper.queryPageList(pageQuery.build(), bo);
         return TableDataInfo.build(result);
     }
 
@@ -62,16 +61,8 @@ public class MsgMatterGroupServiceImpl implements IMsgMatterGroupService {
      */
     @Override
     public List<MsgMatterGroupVo> queryList(MsgMatterGroupBo bo) {
-        LambdaQueryWrapper<MsgMatterGroup> lqw = buildQueryWrapper(bo);
-        return baseMapper.selectVoList(lqw);
-    }
-
-    private LambdaQueryWrapper<MsgMatterGroup> buildQueryWrapper(MsgMatterGroupBo bo) {
-        LambdaQueryWrapper<MsgMatterGroup> lqw = Wrappers.lambdaQuery();
-        lqw.orderByAsc(MsgMatterGroup::getId);
-        lqw.eq(bo.getMatterId() != null, MsgMatterGroup::getMatterId, bo.getMatterId());
-        lqw.eq(bo.getGroupId() != null, MsgMatterGroup::getGroupId, bo.getGroupId());
-        return lqw;
+        Page<MsgMatterGroupVo> result = baseMapper.queryPageList(new PageQuery().build(), bo);
+        return result.getRecords();
     }
 
     /**
@@ -82,14 +73,22 @@ public class MsgMatterGroupServiceImpl implements IMsgMatterGroupService {
      */
     @Override
     public Boolean insertByBo(MsgMatterGroupBo bo) {
-        MsgMatterGroup add = MapstructUtils.convert(bo, MsgMatterGroup.class);
-        validEntityBeforeSave(add);
-        boolean flag = baseMapper.insert(add) > 0;
-        if (flag) {
-            assert add != null;
-            bo.setId(add.getId());
+        List<String> groupIdList = bo.getGroupIdList();
+        List<String> dayMatterIdList = bo.getDayMatterIdList();
+        List<MsgMatterGroup> list = new ArrayList<>();
+        if (!groupIdList.isEmpty() && !dayMatterIdList.isEmpty()) {
+            for (String groupId : groupIdList) {
+                for (String dayMatterId : dayMatterIdList) {
+                    MsgMatterGroup msgMatterGroup = new MsgMatterGroup();
+                    msgMatterGroup.setGroupId(Long.valueOf(groupId));
+                    msgMatterGroup.setDayMatterId(Long.valueOf(dayMatterId));
+                    if (validEntityBeforeSave(msgMatterGroup)) {
+                        list.add(msgMatterGroup);
+                    }
+                }
+            }
         }
-        return flag;
+        return list.isEmpty() || baseMapper.insertBatch(list);
     }
 
     /**
@@ -100,15 +99,35 @@ public class MsgMatterGroupServiceImpl implements IMsgMatterGroupService {
      */
     @Override
     public Boolean updateByBo(MsgMatterGroupBo bo) {
-        MsgMatterGroup update = MapstructUtils.convert(bo, MsgMatterGroup.class);
-        validEntityBeforeSave(update);
-        return baseMapper.updateById(update) > 0;
+        List<String> groupIdList = bo.getGroupIdList();
+        List<String> dayMatterIdList = bo.getDayMatterIdList();
+        if (!groupIdList.isEmpty() && !dayMatterIdList.isEmpty()) {
+            for (String groupId : groupIdList) {
+                for (String dayMatterId : dayMatterIdList) {
+                    MsgMatterGroup msgMatterGroup = new MsgMatterGroup();
+                    msgMatterGroup.setGroupId(Long.valueOf(groupId));
+                    msgMatterGroup.setDayMatterId(Long.valueOf(dayMatterId));
+                    msgMatterGroup.setId(bo.getId());
+                    if (validEntityBeforeSave(msgMatterGroup)) {
+                        baseMapper.updateById(msgMatterGroup);
+                    } else {
+                        throw new ServiceException("事件组不能重复");
+                    }
+                }
+            }
+        }
+        return true;
     }
 
     /**
      * 保存前的数据校验
      */
-    private void validEntityBeforeSave(MsgMatterGroup entity){
+    private boolean validEntityBeforeSave(MsgMatterGroup entity){
+        List<MsgMatterGroupVo> msgMatterGroupList = baseMapper.selectVoList(new LambdaQueryWrapper<MsgMatterGroup>()
+            .eq(MsgMatterGroup::getGroupId, entity.getGroupId())
+            .eq(MsgMatterGroup::getDayMatterId, entity.getDayMatterId())
+            .ne(entity.getId() != null, MsgMatterGroup::getId, entity.getId()));
+        return msgMatterGroupList.isEmpty();
     }
 
     /**

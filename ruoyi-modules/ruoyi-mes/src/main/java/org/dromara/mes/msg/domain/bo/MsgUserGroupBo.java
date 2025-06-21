@@ -25,7 +25,7 @@ public class MsgUserGroupBo extends BaseEntity {
     /**
      * 主键ID
      */
-    @NotNull(message = "主键ID不能为空", groups = { EditGroup.class })
+    @NotNull(message = "主键不能为空", groups = { EditGroup.class })
     private Long id;
 
     /**
@@ -36,13 +36,13 @@ public class MsgUserGroupBo extends BaseEntity {
     /**
      * 用户ID
      */
-    @NotNull(message = "用户ID不能为空", groups = { AddGroup.class, EditGroup.class })
+    @NotNull(message = "用户不能为空", groups = { AddGroup.class, EditGroup.class })
     private List<String> userIdList;
 
     /**
      * 分组ID
      */
-    @NotNull(message = "分组ID不能为空", groups = { AddGroup.class, EditGroup.class })
+    @NotNull(message = "分组不能为空", groups = { AddGroup.class, EditGroup.class })
     private Long groupId;
 
     /**

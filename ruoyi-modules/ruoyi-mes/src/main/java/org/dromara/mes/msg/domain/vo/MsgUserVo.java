@@ -2,6 +2,7 @@ package org.dromara.mes.msg.domain.vo;
 
 import java.util.Date;
 
+import com.alibaba.excel.annotation.write.style.ColumnWidth;
 import org.dromara.common.sensitive.annotation.Sensitive;
 import org.dromara.common.sensitive.core.SensitiveStrategy;
 import org.dromara.mes.msg.domain.MsgUser;
@@ -109,12 +110,14 @@ public class MsgUserVo implements Serializable {
      * 出生日期
      */
     @ExcelProperty(value = "出生日期")
+    @ColumnWidth(20)
     private Date birthday;
 
     /**
      * 农历出生日期
      */
     @ExcelProperty(value = "农历出生日期")
+    @ColumnWidth(20)
     private Date lunarBirthday;
 
     /**

@@ -32,14 +32,30 @@ public class MsgMatterGroupVo implements Serializable {
     /**
      * 事件ID
      */
-    @ExcelProperty(value = "事件ID")
-    private Long matterId;
+    private Long dayMatterId;
 
     /**
      * 分组ID
      */
-    @ExcelProperty(value = "分组ID")
     private Long groupId;
+
+    /**
+     * 事件名称
+     */
+    @ExcelProperty(value = "事件名称")
+    private String dayName;
+
+    /**
+     * 分组名称
+     */
+    @ExcelProperty(value = "分组名称")
+    private String groupName;
+
+    /**
+     * 分组编码
+     */
+    @ExcelProperty(value = "分组编码")
+    private String groupCode;
 
 
 }

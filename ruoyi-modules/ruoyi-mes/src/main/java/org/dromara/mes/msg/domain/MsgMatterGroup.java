@@ -15,7 +15,7 @@ import java.io.Serial;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@TableName("mes_msg_matter_group")
+@TableName("mes_msg_day_matter_group")
 public class MsgMatterGroup extends TenantEntity {
 
     @Serial
@@ -30,7 +30,7 @@ public class MsgMatterGroup extends TenantEntity {
     /**
      * 事件ID
      */
-    private Long matterId;
+    private Long dayMatterId;
 
     /**
      * 分组ID

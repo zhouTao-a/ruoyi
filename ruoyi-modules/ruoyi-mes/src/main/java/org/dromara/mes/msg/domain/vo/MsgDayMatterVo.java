@@ -2,6 +2,7 @@ package org.dromara.mes.msg.domain.vo;
 
 import java.util.Date;
 
+import com.alibaba.excel.annotation.write.style.ColumnWidth;
 import org.dromara.mes.msg.domain.MsgDayMatter;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
@@ -43,6 +44,7 @@ public class MsgDayMatterVo implements Serializable {
      * 事件时间
      */
     @ExcelProperty(value = "事件时间")
+    @ColumnWidth(20)
     private Date dayTarget;
 
 
@@ -85,6 +87,7 @@ public class MsgDayMatterVo implements Serializable {
      * 下次通知时间
      */
     @ExcelProperty(value = "通知时间")
+    @ColumnWidth(20)
     private Date nextNotifyTime;
 
     /**

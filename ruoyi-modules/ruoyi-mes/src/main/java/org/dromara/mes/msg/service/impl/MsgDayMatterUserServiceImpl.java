@@ -1,5 +1,6 @@
 package org.dromara.mes.msg.service.impl;
 
+import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -102,6 +103,8 @@ public class MsgDayMatterUserServiceImpl implements IMsgDayMatterUserService {
                 add.setId(bo.getId());
                 if (validEntityBeforeSave(add)) {
                     baseMapper.updateById(add);
+                } else {
+                    throw new ServiceException("用户事件不能重复");
                 }
             }
         }
