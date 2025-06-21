@@ -9,6 +9,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import jakarta.validation.constraints.*;
 
+import java.util.List;
+
 /**
  * 事件与用户关联业务对象 mes_msg_day_matter_user
  *
@@ -29,14 +31,20 @@ public class MsgDayMatterUserBo extends BaseEntity {
     /**
      * 事件ID
      */
-    @NotNull(message = "事件ID不能为空", groups = { AddGroup.class, EditGroup.class })
+    @NotNull(message = "事件不能为空", groups = { AddGroup.class, EditGroup.class })
     private Long dayMatterId;
 
     /**
      * 用户ID
      */
-    @NotNull(message = "用户ID不能为空", groups = { AddGroup.class, EditGroup.class })
+    @NotNull(message = "用户不能为空", groups = { EditGroup.class })
     private Long userId;
+
+    /**
+     * 用户ID列表
+     */
+    @NotNull(message = "用户不能为空", groups = { AddGroup.class, EditGroup.class })
+    private List<String> userIdList;
 
 
 }

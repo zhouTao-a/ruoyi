@@ -1,12 +1,10 @@
 package org.dromara.mes.msg.service.impl;
 
-import org.dromara.common.core.utils.MapstructUtils;
-import org.dromara.common.core.utils.StringUtils;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.dromara.mes.msg.domain.bo.MsgUserGroupBo;
@@ -15,8 +13,9 @@ import org.dromara.mes.msg.domain.MsgUserGroup;
 import org.dromara.mes.msg.mapper.MsgUserGroupMapper;
 import org.dromara.mes.msg.service.IMsgUserGroupService;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Collection;
 
 /**
@@ -51,8 +50,7 @@ public class MsgUserGroupServiceImpl implements IMsgUserGroupService {
      */
     @Override
     public TableDataInfo<MsgUserGroupVo> queryPageList(MsgUserGroupBo bo, PageQuery pageQuery) {
-        LambdaQueryWrapper<MsgUserGroup> lqw = buildQueryWrapper(bo);
-        Page<MsgUserGroupVo> result = baseMapper.selectVoPage(pageQuery.build(), lqw);
+        Page<MsgUserGroupVo> result = baseMapper.queryPageList(pageQuery.build(), bo);
         return TableDataInfo.build(result);
     }
 
@@ -64,19 +62,8 @@ public class MsgUserGroupServiceImpl implements IMsgUserGroupService {
      */
     @Override
     public List<MsgUserGroupVo> queryList(MsgUserGroupBo bo) {
-        LambdaQueryWrapper<MsgUserGroup> lqw = buildQueryWrapper(bo);
-        return baseMapper.selectVoList(lqw);
-    }
-
-    private LambdaQueryWrapper<MsgUserGroup> buildQueryWrapper(MsgUserGroupBo bo) {
-        Map<String, Object> params = bo.getParams();
-        LambdaQueryWrapper<MsgUserGroup> lqw = Wrappers.lambdaQuery();
-        lqw.orderByAsc(MsgUserGroup::getId);
-        lqw.eq(bo.getUserId() != null, MsgUserGroup::getUserId, bo.getUserId());
-        lqw.eq(bo.getGroupId() != null, MsgUserGroup::getGroupId, bo.getGroupId());
-        lqw.eq(bo.getRelativeGenerationDiff() != null, MsgUserGroup::getRelativeGenerationDiff, bo.getRelativeGenerationDiff());
-        lqw.eq(StringUtils.isNotBlank(bo.getKinshipLevel()), MsgUserGroup::getKinshipLevel, bo.getKinshipLevel());
-        return lqw;
+        Page<MsgUserGroupVo> result = baseMapper.queryPageList(new PageQuery().build(), bo);
+        return result.getRecords();
     }
 
     /**
@@ -87,13 +74,21 @@ public class MsgUserGroupServiceImpl implements IMsgUserGroupService {
      */
     @Override
     public Boolean insertByBo(MsgUserGroupBo bo) {
-        MsgUserGroup add = MapstructUtils.convert(bo, MsgUserGroup.class);
-        validEntityBeforeSave(add);
-        boolean flag = baseMapper.insert(add) > 0;
-        if (flag) {
-            bo.setId(add.getId());
+        List<String> userIdList = bo.getUserIdList();
+        List<MsgUserGroup> msgUserGroupList = new ArrayList<>();
+        if (userIdList != null && !userIdList.isEmpty()) {
+            for (String userId : userIdList) {
+                MsgUserGroup msgUserGroup = new MsgUserGroup();
+                msgUserGroup.setUserId(Long.parseLong(userId));
+                msgUserGroup.setGroupId(bo.getGroupId());
+                msgUserGroup.setRelativeGenerationDiff(bo.getRelativeGenerationDiff());
+                msgUserGroup.setKinshipLevel(bo.getKinshipLevel());
+                if (validEntityBeforeSave(msgUserGroup)) {
+                    msgUserGroupList.add(msgUserGroup);
+                }
+            }
         }
-        return flag;
+        return msgUserGroupList.isEmpty() || baseMapper.insertBatch(msgUserGroupList);
     }
 
     /**
@@ -104,16 +99,39 @@ public class MsgUserGroupServiceImpl implements IMsgUserGroupService {
      */
     @Override
     public Boolean updateByBo(MsgUserGroupBo bo) {
-        MsgUserGroup update = MapstructUtils.convert(bo, MsgUserGroup.class);
-        validEntityBeforeSave(update);
-        return baseMapper.updateById(update) > 0;
+        List<String> userIdList = bo.getUserIdList();
+        if (userIdList != null && !userIdList.isEmpty()) {
+            for (String userId : userIdList) {
+                MsgUserGroup msgUserGroup = new MsgUserGroup();
+                msgUserGroup.setId(bo.getId());
+                msgUserGroup.setUserId(Long.parseLong(userId));
+                msgUserGroup.setGroupId(bo.getGroupId());
+                msgUserGroup.setRelativeGenerationDiff(bo.getRelativeGenerationDiff());
+                msgUserGroup.setKinshipLevel(bo.getKinshipLevel());
+                if (validEntityBeforeSave(msgUserGroup)) {
+                    LambdaUpdateWrapper<MsgUserGroup> updateWrapper = new LambdaUpdateWrapper<>();
+                    updateWrapper.eq(MsgUserGroup::getId, bo.getId());
+                    updateWrapper.set(MsgUserGroup::getUserId, Long.parseLong(userId));
+                    updateWrapper.set(MsgUserGroup::getGroupId, bo.getGroupId());
+                    updateWrapper.set(MsgUserGroup::getRelativeGenerationDiff, bo.getRelativeGenerationDiff());
+                    updateWrapper.set(MsgUserGroup::getKinshipLevel, bo.getKinshipLevel());
+                    updateWrapper.set(MsgUserGroup::getUpdateTime, new Date());
+                    baseMapper.update(updateWrapper);
+                }
+            }
+        }
+        return true;
     }
 
     /**
      * 保存前的数据校验
      */
-    private void validEntityBeforeSave(MsgUserGroup entity){
-        //TODO 做一些数据校验,如唯一约束
+    private boolean validEntityBeforeSave(MsgUserGroup entity){
+        List<MsgUserGroupVo> msgUserGroupList = baseMapper.selectVoList(new LambdaQueryWrapper<MsgUserGroup>()
+            .eq(MsgUserGroup::getUserId, entity.getUserId())
+            .eq(MsgUserGroup::getGroupId, entity.getGroupId())
+            .ne(entity.getId() != null, MsgUserGroup::getId, entity.getId()));
+        return msgUserGroupList.isEmpty();
     }
 
     /**
@@ -125,9 +143,6 @@ public class MsgUserGroupServiceImpl implements IMsgUserGroupService {
      */
     @Override
     public Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid) {
-        if(isValid){
-            //TODO 做一些业务上的校验,判断是否需要校验
-        }
         return baseMapper.deleteByIds(ids) > 0;
     }
 }

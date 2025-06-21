@@ -17,7 +17,7 @@ public enum SensitiveStrategy {
     /**
      * 身份证脱敏
      */
-    ID_CARD(s -> DesensitizedUtil.idCardNum(s, 3, 4)),
+    ID_CARD(s -> DesensitizedUtil.idCardNum(s, 3, 0)),
 
     /**
      * 手机号脱敏

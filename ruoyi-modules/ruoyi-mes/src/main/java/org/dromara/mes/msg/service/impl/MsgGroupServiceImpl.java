@@ -1,22 +1,23 @@
 package org.dromara.mes.msg.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.MapstructUtils;
-import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.RequiredArgsConstructor;
+import org.dromara.mes.msg.domain.MsgGroup;
+import org.dromara.mes.msg.domain.vo.MsgGroupCodeVo;
+import org.dromara.mes.msg.domain.vo.MsgGroupVo;
 import org.springframework.stereotype.Service;
 import org.dromara.mes.msg.domain.bo.MsgGroupBo;
-import org.dromara.mes.msg.domain.vo.MsgGroupVo;
-import org.dromara.mes.msg.domain.MsgGroup;
 import org.dromara.mes.msg.mapper.MsgGroupMapper;
 import org.dromara.mes.msg.service.IMsgGroupService;
 
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Collection;
 
 /**
@@ -51,8 +52,7 @@ public class MsgGroupServiceImpl implements IMsgGroupService {
      */
     @Override
     public TableDataInfo<MsgGroupVo> queryPageList(MsgGroupBo bo, PageQuery pageQuery) {
-        LambdaQueryWrapper<MsgGroup> lqw = buildQueryWrapper(bo);
-        Page<MsgGroupVo> result = baseMapper.selectVoPage(pageQuery.build(), lqw);
+        Page<MsgGroupVo> result = baseMapper.queryPageList(pageQuery.build(), bo);
         return TableDataInfo.build(result);
     }
 
@@ -64,17 +64,9 @@ public class MsgGroupServiceImpl implements IMsgGroupService {
      */
     @Override
     public List<MsgGroupVo> queryList(MsgGroupBo bo) {
-        LambdaQueryWrapper<MsgGroup> lqw = buildQueryWrapper(bo);
-        return baseMapper.selectVoList(lqw);
-    }
-
-    private LambdaQueryWrapper<MsgGroup> buildQueryWrapper(MsgGroupBo bo) {
-        Map<String, Object> params = bo.getParams();
-        LambdaQueryWrapper<MsgGroup> lqw = Wrappers.lambdaQuery();
-        lqw.orderByAsc(MsgGroup::getId);
-        lqw.like(StringUtils.isNotBlank(bo.getGroupName()), MsgGroup::getGroupName, bo.getGroupName());
-        lqw.eq(StringUtils.isNotBlank(bo.getGroupCode()), MsgGroup::getGroupCode, bo.getGroupCode());
-        return lqw;
+        Page<Object> build = new PageQuery().build();
+        Page<MsgGroupVo> msgGroupVoPage = baseMapper.queryPageList(build, bo);
+        return msgGroupVoPage.getRecords();
     }
 
     /**
@@ -85,8 +77,9 @@ public class MsgGroupServiceImpl implements IMsgGroupService {
      */
     @Override
     public Boolean insertByBo(MsgGroupBo bo) {
+        validEntityBeforeSave(bo);
         MsgGroup add = MapstructUtils.convert(bo, MsgGroup.class);
-        validEntityBeforeSave(add);
+        assert add != null;
         boolean flag = baseMapper.insert(add) > 0;
         if (flag) {
             bo.setId(add.getId());
@@ -102,16 +95,26 @@ public class MsgGroupServiceImpl implements IMsgGroupService {
      */
     @Override
     public Boolean updateByBo(MsgGroupBo bo) {
-        MsgGroup update = MapstructUtils.convert(bo, MsgGroup.class);
-        validEntityBeforeSave(update);
-        return baseMapper.updateById(update) > 0;
+        validEntityBeforeSave(bo);
+        LambdaUpdateWrapper<MsgGroup> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.eq(MsgGroup::getId, bo.getId())
+            .set(MsgGroup::getGroupName, bo.getGroupName())
+            .set(MsgGroup::getGroupCode, bo.getGroupCode())
+            .set(MsgGroup::getDefaultTargetUserId, bo.getDefaultTargetUserId())
+            .set(MsgGroup::getUpdateTime, new Date());
+        return baseMapper.update(updateWrapper) > 0;
     }
 
     /**
      * 保存前的数据校验
      */
-    private void validEntityBeforeSave(MsgGroup entity){
-        //TODO 做一些数据校验,如唯一约束
+    private void validEntityBeforeSave(MsgGroupBo entity){
+        List<MsgGroupVo> msgGroupVoList = baseMapper.selectVoList(Wrappers.<MsgGroup>lambdaQuery()
+            .eq(MsgGroup::getGroupCode, entity.getGroupCode())
+            .ne(entity.getId() != null, MsgGroup::getId, entity.getId()));
+        if (!msgGroupVoList.isEmpty()) {
+            throw new ServiceException("用户代码不能重复!");
+        }
     }
 
     /**
@@ -123,9 +126,14 @@ public class MsgGroupServiceImpl implements IMsgGroupService {
      */
     @Override
     public Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid) {
-        if(isValid){
-            //TODO 做一些业务上的校验,判断是否需要校验
-        }
         return baseMapper.deleteByIds(ids) > 0;
+    }
+
+    @Override
+    public List<MsgGroupCodeVo> queryGroupCodePageList(String groupName, String id, PageQuery pageQuery) {
+        if (id != null) {
+            groupName = null;
+        }
+        return baseMapper.queryGroupCodePageList(pageQuery.build(), groupName, id);
     }
 }

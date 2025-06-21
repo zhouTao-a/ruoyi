@@ -1,5 +1,6 @@
 package org.dromara.mes.msg.service;
 
+import org.dromara.mes.msg.domain.vo.MsgUserCodeVo;
 import org.dromara.mes.msg.domain.vo.MsgUserVo;
 import org.dromara.mes.msg.domain.bo.MsgUserBo;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
@@ -65,4 +66,14 @@ public interface IMsgUserService {
      * @return 是否删除成功
      */
     Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid);
+
+    /**
+     * 查询用户代码列表
+     *
+     * @param userName  查询条件
+     * @param id        ID
+     * @param pageQuery 分页参数
+     * @return 用户代码分页列表
+     */
+    List<MsgUserCodeVo> queryUserCodePageList(String userName, String id, PageQuery pageQuery);
 }

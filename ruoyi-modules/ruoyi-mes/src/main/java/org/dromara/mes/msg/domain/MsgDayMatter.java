@@ -4,8 +4,8 @@ import org.dromara.common.tenant.core.TenantEntity;
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
 import java.util.Date;
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.io.Serial;
 
@@ -35,9 +35,14 @@ public class MsgDayMatter extends TenantEntity {
     private String dayName;
 
     /**
-     * 事件目标时间（含时分）
+     * 事件时间
      */
     private Date dayTarget;
+
+    /**
+     *  时间类型（solar-公历, lunar-农历）
+     */
+    private String dayLunar;
 
     /**
      * 事件类型（life, work, anniversary, birthday）
@@ -50,7 +55,7 @@ public class MsgDayMatter extends TenantEntity {
     private String remindType;
 
     /**
-     * 是否重复提醒（T/F）
+     * 重复提醒
      */
     private String repeatFlag;
 
@@ -70,13 +75,9 @@ public class MsgDayMatter extends TenantEntity {
     private Long userId;
 
     /**
-     * 所属分组ID
+     * 逻辑删除标志
      */
-    private Long groupId;
-
-    /**
-     * 逻辑删除标志（T/F）
-     */
+    @TableLogic
     private String deletedFlag;
 
 

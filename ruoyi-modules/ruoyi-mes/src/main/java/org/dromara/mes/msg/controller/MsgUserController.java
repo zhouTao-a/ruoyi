@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.*;
 import cn.dev33.satoken.annotation.SaCheckPermission;
+import org.dromara.mes.msg.domain.vo.MsgUserCodeVo;
+import org.dromara.mes.system.excel.ExcelExportWrapper;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.validation.annotation.Validated;
 import org.dromara.common.idempotent.annotation.RepeatSubmit;
@@ -16,7 +18,6 @@ import org.dromara.common.core.domain.R;
 import org.dromara.common.core.validate.AddGroup;
 import org.dromara.common.core.validate.EditGroup;
 import org.dromara.common.log.enums.BusinessType;
-import org.dromara.common.excel.utils.ExcelUtil;
 import org.dromara.mes.msg.domain.vo.MsgUserVo;
 import org.dromara.mes.msg.domain.bo.MsgUserBo;
 import org.dromara.mes.msg.service.IMsgUserService;
@@ -35,6 +36,7 @@ import org.dromara.common.mybatis.core.page.TableDataInfo;
 public class MsgUserController extends BaseController {
 
     private final IMsgUserService msgUserService;
+    private final ExcelExportWrapper excelExportWrapper;
 
     /**
      * 查询用户列表
@@ -46,14 +48,25 @@ public class MsgUserController extends BaseController {
     }
 
     /**
+     * 查询用户列表
+     */
+    @SaCheckPermission("msg:msgUser:list")
+    @GetMapping("/userCodeList")
+    public R<List<MsgUserCodeVo>> userCodeList(@RequestParam(required = false) String userName,
+                                               @RequestParam(required = false) String id,
+                                               PageQuery pageQuery) {
+        return R.ok(msgUserService.queryUserCodePageList(userName, id, pageQuery));
+    }
+
+    /**
      * 导出用户列表
      */
     @SaCheckPermission("msg:msgUser:export")
     @Log(title = "用户", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     public void export(MsgUserBo bo, HttpServletResponse response) {
-        List<MsgUserVo> list = msgUserService.queryList(bo);
-        ExcelUtil.exportExcel(list, "用户", MsgUserVo.class, response);
+        List<MsgUserVo> list = msgUserService.queryPageList(bo, new PageQuery()).getRows();
+        excelExportWrapper.exportWithSensitiveHandle(list, "用户", MsgUserVo.class, response);
     }
 
     /**
@@ -65,7 +78,10 @@ public class MsgUserController extends BaseController {
     @GetMapping("/{id}")
     public R<MsgUserVo> getInfo(@NotNull(message = "主键不能为空")
                                      @PathVariable Long id) {
-        return R.ok(msgUserService.queryById(id));
+        MsgUserBo bo = new MsgUserBo();
+        bo.setId(id);
+        List<MsgUserVo> list = msgUserService.queryPageList(bo, new PageQuery(1, 1)).getRows();
+        return list.isEmpty() ? R.fail("数据不存在") : R.ok(list.get(0));
     }
 
     /**

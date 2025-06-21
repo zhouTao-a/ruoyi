@@ -124,4 +124,9 @@ public class PageQuery implements Serializable {
         this.pageNum = pageNum;
     }
 
+    public PageQuery() {
+        this.pageSize = DEFAULT_PAGE_SIZE;
+        this.pageNum = DEFAULT_PAGE_NUM;
+    }
+
 }

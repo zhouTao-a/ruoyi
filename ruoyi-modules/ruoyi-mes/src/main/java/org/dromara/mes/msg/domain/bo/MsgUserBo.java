@@ -31,56 +31,78 @@ public class MsgUserBo extends BaseEntity {
      * 用户名
      */
     @NotBlank(message = "用户名不能为空", groups = { AddGroup.class, EditGroup.class })
+    @Size(max = 20, message = "用户名长度不能超过20个字符", groups = { AddGroup.class, EditGroup.class })
     private String userName;
 
     /**
      * 性别
      */
     @NotBlank(message = "性别不能为空", groups = { AddGroup.class, EditGroup.class })
+    @Size(max = 2, message = "性别长度不能超过2个字符", groups = { AddGroup.class, EditGroup.class })
     private String gender;
 
     /**
      * 用户编码
      */
     @NotBlank(message = "用户编码不能为空", groups = { AddGroup.class, EditGroup.class })
+    @Size(max = 20, message = "用户编码长度不能超过20个字符", groups = { AddGroup.class, EditGroup.class })
     private String userCode;
 
     /**
      * 身份证号
      */
+    @Size(max = 18, message = "身份证号长度不能超过18个字符", groups = { AddGroup.class, EditGroup.class })
     private String idCard;
 
     /**
      * 手机号
      */
+    @Size(max = 11, message = "手机号长度不能超过11个字符", groups = { AddGroup.class, EditGroup.class })
     private String phoneNumber;
 
     /**
      * 出生日期
      */
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date birthday;
 
     /**
      * 农历出生日期
      */
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date lunarBirthday;
 
     /**
      * 邮箱地址
      */
+    @Size(max = 50, message = "邮箱地址长度不能超过50个字符", groups = { AddGroup.class, EditGroup.class })
+    @Email(message = "邮箱格式不正确", groups = { AddGroup.class, EditGroup.class })
     private String email;
 
     /**
-     * 是否接收短信通知（T/F）
+     * 短信通知
      */
     private String smsNotifyFlag;
 
     /**
-     * 是否接收邮箱通知（T/F）
+     * 邮箱通知
      */
     private String emailNotifyFlag;
+
+    /**
+     * 父级ID
+     */
+    private Long fatherId;
+
+    /**
+     * 母亲ID
+     */
+    private Long motherId;
+
+    /**
+     * 配偶ID
+     */
+    private Long spouseId;
 
 
 }

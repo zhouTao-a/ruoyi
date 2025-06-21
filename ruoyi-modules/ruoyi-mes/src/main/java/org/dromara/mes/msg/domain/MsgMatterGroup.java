@@ -8,15 +8,15 @@ import lombok.EqualsAndHashCode;
 import java.io.Serial;
 
 /**
- * 分组信息对象 mes_msg_group
+ * 事件组对象 mes_msg_matter_group
  *
- * @author zhout
- * @date 2025-06-08
+ * @author allen
+ * @date 2025-06-18
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@TableName("mes_msg_group")
-public class MsgGroup extends TenantEntity {
+@TableName("mes_msg_day_matter_group")
+public class MsgMatterGroup extends TenantEntity {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -28,19 +28,14 @@ public class MsgGroup extends TenantEntity {
     private Long id;
 
     /**
-     * 分组名称
+     * 事件ID
      */
-    private String groupName;
+    private Long dayMatterId;
 
     /**
-     * 分组编码
+     * 分组ID
      */
-    private String groupCode;
-
-    /**
-     * 默认参考用户ID
-     */
-    private Long defaultTargetUserId;
+    private Long groupId;
 
     /**
      * 逻辑删除标志

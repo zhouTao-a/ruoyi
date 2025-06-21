@@ -1,7 +1,8 @@
 package org.dromara.mes.msg.domain.vo;
 
 import java.util.Date;
-import com.fasterxml.jackson.annotation.JsonFormat;
+
+import com.alibaba.excel.annotation.write.style.ColumnWidth;
 import org.dromara.mes.msg.domain.MsgDayMatter;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
@@ -12,8 +13,6 @@ import lombok.Data;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Date;
-
 
 
 /**
@@ -33,7 +32,6 @@ public class MsgDayMatterVo implements Serializable {
     /**
      * 主键ID
      */
-    @ExcelProperty(value = "主键ID")
     private Long id;
 
     /**
@@ -43,11 +41,19 @@ public class MsgDayMatterVo implements Serializable {
     private String dayName;
 
     /**
-     * 事件目标时间（含时分）
+     * 事件时间
      */
-    @ExcelProperty(value = "事件目标时间", converter = ExcelDictConvert.class)
-    @ExcelDictFormat(readConverterExp = "含=时分")
+    @ExcelProperty(value = "事件时间")
+    @ColumnWidth(20)
     private Date dayTarget;
+
+
+    /**
+     *  时间类型（solar-公历, lunar-农历）
+     */
+    @ExcelProperty(value = "时间类型", converter = ExcelDictConvert.class)
+    @ExcelDictFormat(dictType = "day_lunar")
+    private String dayLunar;
 
     /**
      * 事件类型（life, work, anniversary, birthday）
@@ -64,9 +70,9 @@ public class MsgDayMatterVo implements Serializable {
     private String remindType;
 
     /**
-     * 是否重复提醒（T/F）
+     * 重复提醒
      */
-    @ExcelProperty(value = "是否重复提醒", converter = ExcelDictConvert.class)
+    @ExcelProperty(value = "重复提醒", converter = ExcelDictConvert.class)
     @ExcelDictFormat(dictType = "whether_flag")
     private String repeatFlag;
 
@@ -80,20 +86,24 @@ public class MsgDayMatterVo implements Serializable {
     /**
      * 下次通知时间
      */
-    @ExcelProperty(value = "下次通知时间")
+    @ExcelProperty(value = "通知时间")
+    @ColumnWidth(20)
     private Date nextNotifyTime;
 
     /**
      * 所属用户ID
      */
-    @ExcelProperty(value = "所属用户ID")
     private Long userId;
 
     /**
-     * 所属分组ID
+     * 用户名
      */
-    @ExcelProperty(value = "所属分组ID")
-    private Long groupId;
+    @ExcelProperty(value = "用户名称")
+    private String userName;
 
-
+    /**
+     * 用户编码
+     */
+    @ExcelProperty(value = "用户编码")
+    private String userCode;
 }

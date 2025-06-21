@@ -1,14 +1,16 @@
 package org.dromara.mes.msg.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.RequiredArgsConstructor;
+import org.dromara.mes.msg.domain.vo.MsgUserCodeVo;
 import org.springframework.stereotype.Service;
 import org.dromara.mes.msg.domain.bo.MsgUserBo;
 import org.dromara.mes.msg.domain.vo.MsgUserVo;
@@ -16,9 +18,7 @@ import org.dromara.mes.msg.domain.MsgUser;
 import org.dromara.mes.msg.mapper.MsgUserMapper;
 import org.dromara.mes.msg.service.IMsgUserService;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Collection;
+import java.util.*;
 
 /**
  * 用户Service业务层处理
@@ -52,8 +52,7 @@ public class MsgUserServiceImpl implements IMsgUserService {
      */
     @Override
     public TableDataInfo<MsgUserVo> queryPageList(MsgUserBo bo, PageQuery pageQuery) {
-        LambdaQueryWrapper<MsgUser> lqw = buildQueryWrapper(bo);
-        Page<MsgUserVo> result = baseMapper.selectVoPage(pageQuery.build(), lqw);
+        Page<MsgUserVo> result = baseMapper.queryPageList(pageQuery.build(), bo);
         return TableDataInfo.build(result);
     }
 
@@ -70,11 +69,10 @@ public class MsgUserServiceImpl implements IMsgUserService {
     }
 
     private LambdaQueryWrapper<MsgUser> buildQueryWrapper(MsgUserBo bo) {
-        Map<String, Object> params = bo.getParams();
         LambdaQueryWrapper<MsgUser> lqw = Wrappers.lambdaQuery();
-        lqw.orderByAsc(MsgUser::getId);
+        lqw.orderByDesc(MsgUser::getUpdateTime);
         lqw.like(StringUtils.isNotBlank(bo.getUserName()), MsgUser::getUserName, bo.getUserName());
-        lqw.eq(StringUtils.isNotBlank(bo.getPhoneNumber()), MsgUser::getPhoneNumber, bo.getPhoneNumber());
+        lqw.like(StringUtils.isNotBlank(bo.getPhoneNumber()), MsgUser::getPhoneNumber, bo.getPhoneNumber());
         return lqw;
     }
 
@@ -86,8 +84,9 @@ public class MsgUserServiceImpl implements IMsgUserService {
      */
     @Override
     public Boolean insertByBo(MsgUserBo bo) {
+        validEntityBeforeSave(bo);
         MsgUser add = MapstructUtils.convert(bo, MsgUser.class);
-        validEntityBeforeSave(add);
+        assert add != null;
         boolean flag = baseMapper.insert(add) > 0;
         if (flag) {
             bo.setId(add.getId());
@@ -103,26 +102,36 @@ public class MsgUserServiceImpl implements IMsgUserService {
      */
     @Override
     public Boolean updateByBo(MsgUserBo bo) {
-        UpdateWrapper<MsgUser> updateWrapper = new UpdateWrapper<>();
-        updateWrapper.eq("id", bo.getId())
-            .set("birthday", bo.getBirthday())
-            .set("email", bo.getEmail())
-            .set("email_notify_flag", bo.getEmailNotifyFlag())
-            .set("gender", bo.getGender())
-            .set("id_card", bo.getIdCard())
-            .set("lunar_birthday", bo.getLunarBirthday())
-            .set("phone_number", bo.getPhoneNumber())
-            .set("sms_notify_flag", bo.getSmsNotifyFlag())
-            .set("user_code", bo.getUserCode())
-            .set("user_name", bo.getUserName());
-        return baseMapper.update(null, updateWrapper) > 0;
+        validEntityBeforeSave(bo);
+        LambdaUpdateWrapper<MsgUser> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.eq(MsgUser::getId, bo.getId())
+            .set(MsgUser::getBirthday, bo.getBirthday())
+            .set(MsgUser::getEmail, bo.getEmail())
+            .set(MsgUser::getEmailNotifyFlag, bo.getEmailNotifyFlag())
+            .set(MsgUser::getGender, bo.getGender())
+            .set(MsgUser::getIdCard, bo.getIdCard())
+            .set(MsgUser::getLunarBirthday, bo.getLunarBirthday())
+            .set(MsgUser::getPhoneNumber, bo.getPhoneNumber())
+            .set(MsgUser::getSmsNotifyFlag, bo.getSmsNotifyFlag())
+            .set(MsgUser::getUserCode, bo.getUserCode())
+            .set(MsgUser::getUserName, bo.getUserName())
+            .set(MsgUser::getFatherId, bo.getFatherId())
+            .set(MsgUser::getMotherId, bo.getMotherId())
+            .set(MsgUser::getSpouseId, bo.getSpouseId())
+            .set(MsgUser::getUpdateTime, new Date());
+        return baseMapper.update(updateWrapper) > 0;
     }
 
     /**
      * 保存前的数据校验
      */
-    private void validEntityBeforeSave(MsgUser entity){
-        //TODO 做一些数据校验,如唯一约束
+    private void validEntityBeforeSave(MsgUserBo entity){
+        List<MsgUserVo> msgUserVos = baseMapper.selectVoList(Wrappers.<MsgUser>lambdaQuery()
+            .eq(MsgUser::getUserCode, entity.getUserCode())
+            .ne(entity.getId() != null, MsgUser::getId, entity.getId()));
+        if (!msgUserVos.isEmpty()) {
+            throw new ServiceException("用户代码不能重复!");
+        }
     }
 
     /**
@@ -134,9 +143,15 @@ public class MsgUserServiceImpl implements IMsgUserService {
      */
     @Override
     public Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid) {
-        if(isValid){
-            //TODO 做一些业务上的校验,判断是否需要校验
-        }
         return baseMapper.deleteByIds(ids) > 0;
+    }
+
+    @Override
+    public List<MsgUserCodeVo> queryUserCodePageList(String userName, String id, PageQuery pageQuery) {
+        if (StringUtils.isNotEmpty(id)) {
+            userName = null;
+        }
+        Page<MsgUserCodeVo> result = baseMapper.queryUserCodePageList(pageQuery.build(), id, userName);
+        return result.getRecords();
     }
 }

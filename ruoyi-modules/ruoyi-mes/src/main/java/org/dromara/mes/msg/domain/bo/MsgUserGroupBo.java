@@ -9,6 +9,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import jakarta.validation.constraints.*;
 
+import java.util.List;
+
 /**
  * 用户组业务对象 mes_msg_user_group
  *
@@ -23,31 +25,47 @@ public class MsgUserGroupBo extends BaseEntity {
     /**
      * 主键ID
      */
-    @NotNull(message = "主键ID不能为空", groups = { EditGroup.class })
+    @NotNull(message = "主键不能为空", groups = { EditGroup.class })
     private Long id;
 
     /**
      * 用户ID
      */
-    @NotNull(message = "用户ID不能为空", groups = { AddGroup.class, EditGroup.class })
     private Long userId;
+
+    /**
+     * 用户ID
+     */
+    @NotNull(message = "用户不能为空", groups = { AddGroup.class, EditGroup.class })
+    private List<String> userIdList;
 
     /**
      * 分组ID
      */
-    @NotNull(message = "分组ID不能为空", groups = { AddGroup.class, EditGroup.class })
+    @NotNull(message = "分组不能为空", groups = { AddGroup.class, EditGroup.class })
     private Long groupId;
 
     /**
-     * 代际差
+     * 辈分差
      */
-    private Long relativeGenerationDiff;
+    @Min(value = -100, message = "辈分差不能小于-100", groups = { AddGroup.class, EditGroup.class })
+    @Max(value = 100, message = "辈分差不能大于100", groups = { AddGroup.class, EditGroup.class })
+    private Long relativeGenerationDiff = 0L;
 
     /**
-     * 亲缘关系（close, distant, friend, stranger）
+     * 亲缘关系（spouse, close, distant, friend, stranger）
      */
-    @NotBlank(message = "亲缘关系（close, distant, friend, stranger）不能为空", groups = { AddGroup.class, EditGroup.class })
     private String kinshipLevel;
+
+    /**
+     * 分组名称
+     */
+    private String groupName;
+
+    /**
+     * 用户名
+     */
+    private String userName;
 
 
 }

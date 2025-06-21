@@ -1,6 +1,6 @@
 package org.dromara.mes.msg.domain.vo;
 
-import org.dromara.mes.msg.domain.MsgUserGroup;
+import org.dromara.mes.msg.domain.MsgMatterGroup;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import io.github.linpeilie.annotations.AutoMapper;
@@ -11,15 +11,15 @@ import java.io.Serializable;
 
 
 /**
- * 用户组视图对象 mes_msg_user_group
+ * 事件组视图对象 mes_msg_matter_group
  *
- * @author zhout
- * @date 2025-06-08
+ * @author allen
+ * @date 2025-06-18
  */
 @Data
 @ExcelIgnoreUnannotated
-@AutoMapper(target = MsgUserGroup.class)
-public class MsgUserGroupVo implements Serializable {
+@AutoMapper(target = MsgMatterGroup.class)
+public class MsgMatterGroupVo implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -30,9 +30,9 @@ public class MsgUserGroupVo implements Serializable {
     private Long id;
 
     /**
-     * 用户ID
+     * 事件ID
      */
-    private Long userId;
+    private Long dayMatterId;
 
     /**
      * 分组ID
@@ -40,16 +40,10 @@ public class MsgUserGroupVo implements Serializable {
     private Long groupId;
 
     /**
-     * 用户名
+     * 事件名称
      */
-    @ExcelProperty(value = "用户名称")
-    private String userName;
-
-    /**
-     * 用户编码
-     */
-    @ExcelProperty(value = "用户编码")
-    private String userCode;
+    @ExcelProperty(value = "事件名称")
+    private String dayName;
 
     /**
      * 分组名称
@@ -63,13 +57,5 @@ public class MsgUserGroupVo implements Serializable {
     @ExcelProperty(value = "分组编码")
     private String groupCode;
 
-    /**
-     * 辈分差
-     */
-    private Long relativeGenerationDiff;
 
-    /**
-     * 亲缘关系（spouse, close, distant, friend, stranger）
-     */
-    private String kinshipLevel;
 }

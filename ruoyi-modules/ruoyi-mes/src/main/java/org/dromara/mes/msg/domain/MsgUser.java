@@ -5,9 +5,6 @@ import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import java.util.Date;
-import com.fasterxml.jackson.annotation.JsonFormat;
-
-import java.io.Serial;
 
 /**
  * 用户对象 mes_msg_user
@@ -19,9 +16,6 @@ import java.io.Serial;
 @EqualsAndHashCode(callSuper = true)
 @TableName("mes_msg_user")
 public class MsgUser extends TenantEntity {
-
-    @Serial
-    private static final long serialVersionUID = 1L;
 
     /**
      * 主键ID
@@ -70,19 +64,34 @@ public class MsgUser extends TenantEntity {
     private String email;
 
     /**
-     * 是否接收短信通知（T/F）
+     * 短信通知
      */
     private String smsNotifyFlag;
 
     /**
-     * 是否接收邮箱通知（T/F）
+     * 邮箱通知
      */
     private String emailNotifyFlag;
 
     /**
-     * 逻辑删除标志（T/F）
+     * 逻辑删除标志
      */
+    @TableLogic
     private String deletedFlag;
 
+    /**
+     * 父级ID
+     */
+    private Long fatherId;
+
+    /**
+     * 母亲ID
+     */
+    private Long motherId;
+
+    /**
+     * 配偶ID
+     */
+    private Long spouseId;
 
 }

@@ -1,11 +1,9 @@
 package org.dromara.mes.msg.service.impl;
 
-import org.dromara.common.core.utils.MapstructUtils;
-import org.dromara.common.core.utils.StringUtils;
+import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,7 +14,6 @@ import org.dromara.mes.msg.mapper.MsgDayMatterUserMapper;
 import org.dromara.mes.msg.service.IMsgDayMatterUserService;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Collection;
 
 /**
@@ -51,8 +48,7 @@ public class MsgDayMatterUserServiceImpl implements IMsgDayMatterUserService {
      */
     @Override
     public TableDataInfo<MsgDayMatterUserVo> queryPageList(MsgDayMatterUserBo bo, PageQuery pageQuery) {
-        LambdaQueryWrapper<MsgDayMatterUser> lqw = buildQueryWrapper(bo);
-        Page<MsgDayMatterUserVo> result = baseMapper.selectVoPage(pageQuery.build(), lqw);
+        Page<MsgDayMatterUserVo> result = baseMapper.queryPageList(pageQuery.build(), bo);
         return TableDataInfo.build(result);
     }
 
@@ -64,17 +60,8 @@ public class MsgDayMatterUserServiceImpl implements IMsgDayMatterUserService {
      */
     @Override
     public List<MsgDayMatterUserVo> queryList(MsgDayMatterUserBo bo) {
-        LambdaQueryWrapper<MsgDayMatterUser> lqw = buildQueryWrapper(bo);
-        return baseMapper.selectVoList(lqw);
-    }
-
-    private LambdaQueryWrapper<MsgDayMatterUser> buildQueryWrapper(MsgDayMatterUserBo bo) {
-        Map<String, Object> params = bo.getParams();
-        LambdaQueryWrapper<MsgDayMatterUser> lqw = Wrappers.lambdaQuery();
-        lqw.orderByAsc(MsgDayMatterUser::getId);
-        lqw.eq(bo.getDayMatterId() != null, MsgDayMatterUser::getDayMatterId, bo.getDayMatterId());
-        lqw.eq(bo.getUserId() != null, MsgDayMatterUser::getUserId, bo.getUserId());
-        return lqw;
+        Page<MsgDayMatterUserVo> result = baseMapper.queryPageList(new PageQuery().build(), bo);
+        return result.getRecords();
     }
 
     /**
@@ -85,13 +72,18 @@ public class MsgDayMatterUserServiceImpl implements IMsgDayMatterUserService {
      */
     @Override
     public Boolean insertByBo(MsgDayMatterUserBo bo) {
-        MsgDayMatterUser add = MapstructUtils.convert(bo, MsgDayMatterUser.class);
-        validEntityBeforeSave(add);
-        boolean flag = baseMapper.insert(add) > 0;
-        if (flag) {
-            bo.setId(add.getId());
+        List<String> userIdList = bo.getUserIdList();
+        if (!userIdList.isEmpty()) {
+            for (String userId : userIdList) {
+                MsgDayMatterUser add = new MsgDayMatterUser();
+                add.setUserId(Long.valueOf(userId));
+                add.setDayMatterId(bo.getDayMatterId());
+                if (validEntityBeforeSave(add)) {
+                    baseMapper.insert(add);
+                }
+            }
         }
-        return flag;
+        return true;
     }
 
     /**
@@ -102,16 +94,32 @@ public class MsgDayMatterUserServiceImpl implements IMsgDayMatterUserService {
      */
     @Override
     public Boolean updateByBo(MsgDayMatterUserBo bo) {
-        MsgDayMatterUser update = MapstructUtils.convert(bo, MsgDayMatterUser.class);
-        validEntityBeforeSave(update);
-        return baseMapper.updateById(update) > 0;
+        List<String> userIdList = bo.getUserIdList();
+        if (!userIdList.isEmpty()) {
+            for (String userId : userIdList) {
+                MsgDayMatterUser add = new MsgDayMatterUser();
+                add.setUserId(Long.valueOf(userId));
+                add.setDayMatterId(bo.getDayMatterId());
+                add.setId(bo.getId());
+                if (validEntityBeforeSave(add)) {
+                    baseMapper.updateById(add);
+                } else {
+                    throw new ServiceException("用户事件不能重复");
+                }
+            }
+        }
+        return true;
     }
 
     /**
      * 保存前的数据校验
      */
-    private void validEntityBeforeSave(MsgDayMatterUser entity){
-        //TODO 做一些数据校验,如唯一约束
+    private boolean validEntityBeforeSave(MsgDayMatterUser entity){
+        List<MsgDayMatterUserVo> voList = baseMapper.selectVoList(Wrappers.<MsgDayMatterUser>lambdaQuery()
+            .eq(MsgDayMatterUser::getUserId, entity.getUserId())
+            .eq(MsgDayMatterUser::getDayMatterId, entity.getDayMatterId())
+            .ne(entity.getId() != null, MsgDayMatterUser::getId, entity.getId()));
+        return voList.isEmpty();
     }
 
     /**
@@ -123,9 +131,6 @@ public class MsgDayMatterUserServiceImpl implements IMsgDayMatterUserService {
      */
     @Override
     public Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid) {
-        if(isValid){
-            //TODO 做一些业务上的校验,判断是否需要校验
-        }
         return baseMapper.deleteByIds(ids) > 0;
     }
 }

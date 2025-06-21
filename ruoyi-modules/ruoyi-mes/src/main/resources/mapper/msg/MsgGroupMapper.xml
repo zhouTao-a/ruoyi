@@ -4,4 +4,47 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.dromara.mes.msg.mapper.MsgGroupMapper">
 
+    <select id="queryPageList" resultType="org.dromara.mes.msg.domain.vo.MsgGroupVo">
+        select
+            g.id,
+        g.group_name,
+        g.group_code,
+        g.default_target_user_id,
+        u.user_code as default_target_user_code,
+        u.user_name as default_target_user_name
+        from mes_msg_group g
+        left join mes_msg_user u on g.default_target_user_id = u.id and u.deleted_flag = '0'
+        <where>
+            g.deleted_flag = '0'
+            <if test="param.groupName != null and param.groupName != ''">
+                and g.group_name like concat('%', #{param.groupName}, '%')
+            </if>
+            <if test="param.groupCode != null and param.groupCode != ''">
+                and g.group_code like concat('%', #{param.groupCode}, '%')
+            </if>
+            <if test="param.id != null ">
+                and g.id = #{param.id}
+            </if>
+        </where>
+        order by g.update_time desc
+    </select>
+
+    <select id="queryGroupCodePageList" resultType="org.dromara.mes.msg.domain.vo.MsgGroupCodeVo">
+        select
+            g.id,
+            g.group_name,
+            g.group_code
+        from mes_msg_group g
+        <where>
+            g.deleted_flag = '0'
+            <if test="groupName != null and groupName != ''">
+                and (g.group_name like concat('%', #{groupName}, '%')
+                or g.group_code like concat ('%', #{groupName}, '%'))
+            </if>
+            <if test="id != null ">
+                and g.id = #{id}
+            </if>
+        </where>
+        order by g.update_time desc
+    </select>
 </mapper>
