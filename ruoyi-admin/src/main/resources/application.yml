@@ -255,6 +255,7 @@ management:
 sse:
   enabled: true
   path: /resource/sse
+  refresh: /notice/refresh
 
 --- # websocket
 websocket:
