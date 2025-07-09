@@ -1,5 +1,6 @@
 package org.dromara.mes.msg.service.impl;
 
+import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.MapstructUtils;
@@ -9,16 +10,21 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.RequiredArgsConstructor;
 import org.dromara.mes.msg.domain.vo.MsgDayMatterNameVo;
+import org.dromara.mes.msg.domain.vo.ReminderVo;
+import org.dromara.mes.utils.TimeCalculatorUtil;
 import org.springframework.stereotype.Service;
 import org.dromara.mes.msg.domain.bo.MsgDayMatterBo;
 import org.dromara.mes.msg.domain.vo.MsgDayMatterVo;
 import org.dromara.mes.msg.domain.MsgDayMatter;
 import org.dromara.mes.msg.mapper.MsgDayMatterMapper;
 import org.dromara.mes.msg.service.IMsgDayMatterService;
+import org.springframework.util.CollectionUtils;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 /**
  * 事件Service业务层处理
@@ -137,5 +143,34 @@ public class MsgDayMatterServiceImpl implements IMsgDayMatterService {
     @Override
     public List<MsgDayMatterNameVo> queryDayNameList(String dayName, String id, PageQuery pageQuery) {
         return baseMapper.queryDayNameList(pageQuery.build(), dayName, id);
+    }
+
+    @Override
+    public List<ReminderVo> dayMatterList(int year, int month) {
+        Date[] rangeDateStr = TimeCalculatorUtil.getRangeDate((year + "-" + month + "-01"), TimeCalculatorUtil.RangeType.MONTH);
+        MsgDayMatterBo bo = new MsgDayMatterBo();
+        bo.setNotifyStartTime(rangeDateStr[0]);
+        bo.setNotifyEndTime(rangeDateStr[1]);
+        Page<MsgDayMatterVo> msgDayMatterVoPage = baseMapper.queryPageList(new PageQuery().build(), bo);
+        List<MsgDayMatterVo> msgDayMatterVoList = msgDayMatterVoPage.getRecords();
+        if (CollectionUtils.isEmpty(msgDayMatterVoList)) {
+            return List.of();
+        }
+        return msgDayMatterVoList.stream().map(item -> {
+            ReminderVo dto = new ReminderVo();
+            dto.setContent(item.getDayName());
+            dto.setType(item.getDayType());
+            if ("lunar".equalsIgnoreCase(item.getDayLunar())) {
+                dto.setIsLunar(true);
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(item.getDayTarget());
+                dto.setLunarMonth(calendar.get(Calendar.MONTH) + 1);
+                dto.setLunarDay(calendar.get(Calendar.DAY_OF_MONTH));
+            } else {
+                dto.setIsLunar(false);
+                dto.setDate(DateUtil.format(item.getDayTarget(), "yyyy-MM-dd"));
+            }
+            return dto;
+        }).collect(Collectors.toList());
     }
 }

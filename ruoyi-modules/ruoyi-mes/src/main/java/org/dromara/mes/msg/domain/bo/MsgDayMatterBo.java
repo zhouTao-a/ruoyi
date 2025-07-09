@@ -81,6 +81,17 @@ public class MsgDayMatterBo extends BaseEntity {
      */
     private Date nextNotifyTime;
 
+
+    /**
+     * 下次通知时间
+     */
+    private Date notifyStartTime;
+
+    /**
+     * 下次通知时间
+     */
+    private Date notifyEndTime;
+
     /**
      * 所属用户ID
      */

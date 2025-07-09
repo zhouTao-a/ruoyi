@@ -24,8 +24,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import java.util.List;
-
 /**
  * 权限安全配置
  *
@@ -52,8 +50,6 @@ public class SecurityConfig implements WebMvcConfigurer {
                 SaRouter
                     // 获取所有的
                     .match(allUrlHandler.getUrls())
-                    // 动态配置 忽略鉴权
-                    .notMatch(excludePaths())
                     // 对未排除的路径进行检查
                     .check(() -> {
                         HttpServletRequest request = ServletUtils.getRequest();
@@ -106,7 +102,4 @@ public class SecurityConfig implements WebMvcConfigurer {
             .setError(e -> SaResult.error(e.getMessage()).setCode(HttpStatus.UNAUTHORIZED));
     }
 
-    public List<String> excludePaths() {
-        return List.of("/notice/refresh");
-    }
 }
