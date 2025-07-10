@@ -123,7 +123,7 @@ public class MsgMatterGroupServiceImpl implements IMsgMatterGroupService {
      * 保存前的数据校验
      */
     private boolean validEntityBeforeSave(MsgMatterGroup entity){
-        return baseMapper.exists(new LambdaQueryWrapper<MsgMatterGroup>()
+        return !baseMapper.exists(new LambdaQueryWrapper<MsgMatterGroup>()
             .eq(MsgMatterGroup::getGroupId, entity.getGroupId())
             .eq(MsgMatterGroup::getDayMatterId, entity.getDayMatterId())
             .ne(entity.getId() != null, MsgMatterGroup::getId, entity.getId()));

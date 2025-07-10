@@ -80,9 +80,15 @@ public interface IMsgDayMatterService {
     /**
      * 查询事件列表
      *
-     * @param year  年
-     * @param month 月
+     * @param year    年
+     * @param month   月
+     * @param groupId 分组id
      * @return 事件列表
      */
-    List<ReminderVo> dayMatterList(int year, int month);
+    List<ReminderVo> dayMatterList(int year, int month, Long groupId);
+
+    /**
+     * 定时更新下次提醒时间
+     */
+    void updateNextNotifyTime();
 }

@@ -56,8 +56,10 @@ public class MsgDayMatterController extends BaseController {
      */
     @SaIgnore
     @GetMapping("/dayMatterList")
-    public R<List<ReminderVo>> dayMatterList(@RequestParam int year, @RequestParam int month) {
-        return R.ok(msgDayMatterService.dayMatterList(year, month));
+    public R<List<ReminderVo>> dayMatterList(@RequestParam int year,
+                                             @RequestParam int month,
+                                             @RequestParam(required = false) Long groupId) {
+        return R.ok(msgDayMatterService.dayMatterList(year, month, groupId));
     }
 
     /**

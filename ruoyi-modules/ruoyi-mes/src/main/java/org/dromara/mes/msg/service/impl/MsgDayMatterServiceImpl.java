@@ -1,6 +1,7 @@
 package org.dromara.mes.msg.service.impl;
 
 import cn.hutool.core.date.DateUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.MapstructUtils;
@@ -9,18 +10,18 @@ import org.dromara.common.mybatis.core.page.PageQuery;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.RequiredArgsConstructor;
-import org.dromara.mes.msg.domain.vo.MsgDayMatterNameVo;
-import org.dromara.mes.msg.domain.vo.ReminderVo;
+import org.dromara.mes.msg.domain.MsgMatterGroup;
+import org.dromara.mes.msg.domain.vo.*;
+import org.dromara.mes.msg.enums.WhetherFlag;
+import org.dromara.mes.msg.mapper.MsgMatterGroupMapper;
 import org.dromara.mes.utils.TimeCalculatorUtil;
 import org.springframework.stereotype.Service;
 import org.dromara.mes.msg.domain.bo.MsgDayMatterBo;
-import org.dromara.mes.msg.domain.vo.MsgDayMatterVo;
 import org.dromara.mes.msg.domain.MsgDayMatter;
 import org.dromara.mes.msg.mapper.MsgDayMatterMapper;
 import org.dromara.mes.msg.service.IMsgDayMatterService;
 import org.springframework.util.CollectionUtils;
 
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Collection;
@@ -37,6 +38,7 @@ import java.util.stream.Collectors;
 public class MsgDayMatterServiceImpl implements IMsgDayMatterService {
 
     private final MsgDayMatterMapper baseMapper;
+    private final MsgMatterGroupMapper msgMatterGroupMapper;
 
     /**
      * 查询事件
@@ -81,7 +83,6 @@ public class MsgDayMatterServiceImpl implements IMsgDayMatterService {
      */
     @Override
     public Boolean insertByBo(MsgDayMatterBo bo) {
-        validEntityBeforeSave(bo);
         MsgDayMatter add = MapstructUtils.convert(bo, MsgDayMatter.class);
         assert add != null;
         boolean flag = baseMapper.insert(add) > 0;
@@ -122,7 +123,7 @@ public class MsgDayMatterServiceImpl implements IMsgDayMatterService {
         boolean exists = baseMapper.exists(Wrappers.<MsgDayMatter>lambdaQuery()
             .eq(MsgDayMatter::getDayName, entity.getDayName())
             .ne(entity.getId() != null, MsgDayMatter::getId, entity.getId()));
-        if (!exists) {
+        if (exists) {
             throw new ServiceException("事件名称不能重复!");
         }
         entity.calculateNextNotifyTime();
@@ -146,7 +147,7 @@ public class MsgDayMatterServiceImpl implements IMsgDayMatterService {
     }
 
     @Override
-    public List<ReminderVo> dayMatterList(int year, int month) {
+    public List<ReminderVo> dayMatterList(int year, int month, Long groupId) {
         Date[] rangeDateStr = TimeCalculatorUtil.getRangeDate((year + "-" + month + "-01"), TimeCalculatorUtil.RangeType.MONTH);
         MsgDayMatterBo bo = new MsgDayMatterBo();
         bo.setNotifyStartTime(rangeDateStr[0]);
@@ -156,21 +157,49 @@ public class MsgDayMatterServiceImpl implements IMsgDayMatterService {
         if (CollectionUtils.isEmpty(msgDayMatterVoList)) {
             return List.of();
         }
-        return msgDayMatterVoList.stream().map(item -> {
-            ReminderVo dto = new ReminderVo();
-            dto.setContent(item.getDayName());
-            dto.setType(item.getDayType());
-            if ("lunar".equalsIgnoreCase(item.getDayLunar())) {
-                dto.setIsLunar(true);
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTime(item.getDayTarget());
-                dto.setLunarMonth(calendar.get(Calendar.MONTH) + 1);
-                dto.setLunarDay(calendar.get(Calendar.DAY_OF_MONTH));
-            } else {
+
+        List<Long> filteredDayMatterIds;
+        if (groupId != null) {
+            // 1. 查询属于该 groupId 的所有 dayMatterId
+            List<MsgMatterGroupVo> msgMatterGroupVoList = msgMatterGroupMapper.selectVoList(
+                new LambdaQueryWrapper<MsgMatterGroup>().eq(MsgMatterGroup::getGroupId, groupId)
+            );
+
+            filteredDayMatterIds = msgMatterGroupVoList.stream()
+                .map(MsgMatterGroupVo::getDayMatterId)
+                .toList();
+        } else {
+            filteredDayMatterIds = null;
+        }
+
+        return msgDayMatterVoList.stream()
+            // 2. 只保留属于该 group 的事件（如果 groupId 存在）
+            .filter(item -> filteredDayMatterIds == null || filteredDayMatterIds.contains(item.getId()))
+            // 3. 转换成 ReminderVo
+            .map(item -> {
+                ReminderVo dto = new ReminderVo();
+                dto.setContent(item.getDayName());
+                dto.setType(item.getDayType());
                 dto.setIsLunar(false);
-                dto.setDate(DateUtil.format(item.getDayTarget(), "yyyy-MM-dd"));
+                dto.setDate(DateUtil.format(item.getNextNotifyTime(), "yyyy-MM-dd"));
+                return dto;
+            })
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public void updateNextNotifyTime() {
+        MsgDayMatterBo bo = new MsgDayMatterBo();
+        bo.setNotifyEndTime(new Date());
+        Page<MsgDayMatterVo> msgDayMatterVoPage = baseMapper.queryPageList(new PageQuery().build(), bo);
+        msgDayMatterVoPage.getRecords().forEach(item -> {
+            item.calculateNextNotifyTime();
+            if (WhetherFlag.YES.getCode().equals(item.getRepeatFlag())) {
+                baseMapper.update(new LambdaUpdateWrapper<MsgDayMatter>()
+                    .eq(MsgDayMatter::getId, item.getId())
+                    .set(MsgDayMatter::getNextNotifyTime, item.getNextNotifyTime())
+                );
             }
-            return dto;
-        }).collect(Collectors.toList());
+        });
     }
 }

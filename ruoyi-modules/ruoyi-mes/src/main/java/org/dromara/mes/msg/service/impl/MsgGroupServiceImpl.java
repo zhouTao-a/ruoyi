@@ -113,7 +113,7 @@ public class MsgGroupServiceImpl implements IMsgGroupService {
             .eq(MsgGroup::getGroupCode, entity.getGroupCode())
             .ne(entity.getId() != null, MsgGroup::getId, entity.getId()));
         if (exists) {
-            throw new ServiceException("用户代码不能重复!");
+            throw new ServiceException("分组代码不能重复!");
         }
     }
 
