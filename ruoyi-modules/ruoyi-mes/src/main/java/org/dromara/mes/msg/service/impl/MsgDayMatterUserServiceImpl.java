@@ -115,11 +115,10 @@ public class MsgDayMatterUserServiceImpl implements IMsgDayMatterUserService {
      * 保存前的数据校验
      */
     private boolean validEntityBeforeSave(MsgDayMatterUser entity){
-        List<MsgDayMatterUserVo> voList = baseMapper.selectVoList(Wrappers.<MsgDayMatterUser>lambdaQuery()
+        return baseMapper.exists(Wrappers.<MsgDayMatterUser>lambdaQuery()
             .eq(MsgDayMatterUser::getUserId, entity.getUserId())
             .eq(MsgDayMatterUser::getDayMatterId, entity.getDayMatterId())
             .ne(entity.getId() != null, MsgDayMatterUser::getId, entity.getId()));
-        return voList.isEmpty();
     }
 
     /**

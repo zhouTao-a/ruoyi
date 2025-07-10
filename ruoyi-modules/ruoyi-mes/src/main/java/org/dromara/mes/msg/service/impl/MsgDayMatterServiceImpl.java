@@ -119,10 +119,10 @@ public class MsgDayMatterServiceImpl implements IMsgDayMatterService {
      * 保存前的数据校验
      */
     private void validEntityBeforeSave(MsgDayMatterBo entity){
-        List<MsgDayMatterVo> msgDayMatterVoList = baseMapper.selectVoList(Wrappers.<MsgDayMatter>lambdaQuery()
+        boolean exists = baseMapper.exists(Wrappers.<MsgDayMatter>lambdaQuery()
             .eq(MsgDayMatter::getDayName, entity.getDayName())
             .ne(entity.getId() != null, MsgDayMatter::getId, entity.getId()));
-        if (!msgDayMatterVoList.isEmpty()) {
+        if (!exists) {
             throw new ServiceException("事件名称不能重复!");
         }
         entity.calculateNextNotifyTime();

@@ -127,11 +127,10 @@ public class MsgUserGroupServiceImpl implements IMsgUserGroupService {
      * 保存前的数据校验
      */
     private boolean validEntityBeforeSave(MsgUserGroup entity){
-        List<MsgUserGroupVo> msgUserGroupList = baseMapper.selectVoList(new LambdaQueryWrapper<MsgUserGroup>()
+        return baseMapper.exists(new LambdaQueryWrapper<MsgUserGroup>()
             .eq(MsgUserGroup::getUserId, entity.getUserId())
             .eq(MsgUserGroup::getGroupId, entity.getGroupId())
             .ne(entity.getId() != null, MsgUserGroup::getId, entity.getId()));
-        return msgUserGroupList.isEmpty();
     }
 
     /**

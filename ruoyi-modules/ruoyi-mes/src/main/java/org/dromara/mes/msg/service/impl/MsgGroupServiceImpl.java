@@ -109,10 +109,10 @@ public class MsgGroupServiceImpl implements IMsgGroupService {
      * 保存前的数据校验
      */
     private void validEntityBeforeSave(MsgGroupBo entity){
-        List<MsgGroupVo> msgGroupVoList = baseMapper.selectVoList(Wrappers.<MsgGroup>lambdaQuery()
+        boolean exists = baseMapper.exists(Wrappers.<MsgGroup>lambdaQuery()
             .eq(MsgGroup::getGroupCode, entity.getGroupCode())
             .ne(entity.getId() != null, MsgGroup::getId, entity.getId()));
-        if (!msgGroupVoList.isEmpty()) {
+        if (exists) {
             throw new ServiceException("用户代码不能重复!");
         }
     }
