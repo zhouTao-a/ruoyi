@@ -83,6 +83,7 @@ public class MsgDayMatterServiceImpl implements IMsgDayMatterService {
      */
     @Override
     public Boolean insertByBo(MsgDayMatterBo bo) {
+        validEntityBeforeSave(bo);
         MsgDayMatter add = MapstructUtils.convert(bo, MsgDayMatter.class);
         assert add != null;
         boolean flag = baseMapper.insert(add) > 0;
