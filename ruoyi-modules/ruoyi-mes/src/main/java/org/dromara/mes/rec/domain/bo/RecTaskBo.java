@@ -1,5 +1,6 @@
 package org.dromara.mes.rec.domain.bo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.dromara.mes.rec.domain.RecTask;
 import org.dromara.common.mybatis.core.domain.BaseEntity;
 import org.dromara.common.core.validate.AddGroup;
@@ -55,6 +56,7 @@ public class RecTaskBo extends BaseEntity {
     /**
      * 截止日期
      */
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date deadLine;
 
     /**
