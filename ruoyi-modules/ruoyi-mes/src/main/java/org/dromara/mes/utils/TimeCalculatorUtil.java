@@ -380,6 +380,32 @@ public class TimeCalculatorUtil {
     }
 
 
+    /**
+     * 基于LocalDateTime计算时间范围（仅支持HOUR，默认时区）
+     * @param rangeType 时间维度类型
+     * @return [startInclusive, endExclusive)
+     */
+    public static long[] calculateRange(RangeType rangeType) {
+        return calculateRange(LocalDate.now(), rangeType, DEFAULT_ZONE);
+    }
+
+    /**
+     * 获取指定 LocalDate 范围的起止时间（Date[]）
+     */
+    public static Date[] getRangeDate(RangeType type) {
+        long[] range = calculateRange(LocalDate.now(), type, DEFAULT_ZONE);
+        return new Date[]{ new Date(range[0]), new Date(range[1]) };
+    }
+
+
+    public static String[] getRangeDateStr(RangeType type) {
+        long[] range = calculateRange(LocalDate.now(), type);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd").withZone(DEFAULT_ZONE);
+        return new String[]{
+            formatter.format(Instant.ofEpochMilli(range[0])),
+            formatter.format(Instant.ofEpochMilli(range[1]))
+        };
+    }
 
 
 
