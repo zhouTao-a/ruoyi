@@ -1,13 +1,15 @@
 package org.dromara.mes.rec.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import org.dromara.common.core.exception.ServiceException;
+import org.dromara.common.core.utils.DateUtils;
 import org.dromara.common.core.utils.MapstructUtils;
-import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.RequiredArgsConstructor;
+import org.dromara.common.satoken.utils.LoginHelper;
 import org.springframework.stereotype.Service;
 import org.dromara.mes.rec.domain.bo.RecReportBo;
 import org.dromara.mes.rec.domain.vo.RecReportVo;
@@ -15,8 +17,8 @@ import org.dromara.mes.rec.domain.RecReport;
 import org.dromara.mes.rec.mapper.RecReportMapper;
 import org.dromara.mes.rec.service.IRecReportService;
 
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Collection;
 
 /**
@@ -39,7 +41,9 @@ public class RecReportServiceImpl implements IRecReportService {
      */
     @Override
     public RecReportVo queryById(Long id){
-        return baseMapper.selectVoById(id);
+        RecReportBo bo = new RecReportBo();
+        bo.setId(id);
+        return queryPageList(bo, new PageQuery(1, 1)).getRows().get(0);
     }
 
     /**
@@ -51,8 +55,12 @@ public class RecReportServiceImpl implements IRecReportService {
      */
     @Override
     public TableDataInfo<RecReportVo> queryPageList(RecReportBo bo, PageQuery pageQuery) {
-        LambdaQueryWrapper<RecReport> lqw = buildQueryWrapper(bo);
-        Page<RecReportVo> result = baseMapper.selectVoPage(pageQuery.build(), lqw);
+        //只查询当前登录人的报告
+        bo.setUserId(LoginHelper.getUserId());
+        if (bo.getEndReportDate() != null) {
+            bo.setEndReportDate(DateUtils.addDays(bo.getEndReportDate(), 1));
+        }
+        Page<RecReportVo> result = baseMapper.queryPageList(pageQuery.build(), bo);
         return TableDataInfo.build(result);
     }
 
@@ -64,17 +72,7 @@ public class RecReportServiceImpl implements IRecReportService {
      */
     @Override
     public List<RecReportVo> queryList(RecReportBo bo) {
-        LambdaQueryWrapper<RecReport> lqw = buildQueryWrapper(bo);
-        return baseMapper.selectVoList(lqw);
-    }
-
-    private LambdaQueryWrapper<RecReport> buildQueryWrapper(RecReportBo bo) {
-        Map<String, Object> params = bo.getParams();
-        LambdaQueryWrapper<RecReport> lqw = Wrappers.lambdaQuery();
-        lqw.orderByAsc(RecReport::getId);
-        lqw.eq(StringUtils.isNotBlank(bo.getReportType()), RecReport::getReportType, bo.getReportType());
-        lqw.eq(bo.getReportDate() != null, RecReport::getReportDate, bo.getReportDate());
-        return lqw;
+        return queryPageList(bo, new PageQuery()).getRows();
     }
 
     /**
@@ -86,12 +84,10 @@ public class RecReportServiceImpl implements IRecReportService {
     @Override
     public Boolean insertByBo(RecReportBo bo) {
         RecReport add = MapstructUtils.convert(bo, RecReport.class);
+        assert add != null;
         validEntityBeforeSave(add);
-        boolean flag = baseMapper.insert(add) > 0;
-        if (flag) {
-            bo.setId(add.getId());
-        }
-        return flag;
+        add.setUserId(LoginHelper.getUserId());
+        return baseMapper.insert(add) > 0;
     }
 
     /**
@@ -103,15 +99,29 @@ public class RecReportServiceImpl implements IRecReportService {
     @Override
     public Boolean updateByBo(RecReportBo bo) {
         RecReport update = MapstructUtils.convert(bo, RecReport.class);
+        assert update != null;
         validEntityBeforeSave(update);
-        return baseMapper.updateById(update) > 0;
+        LambdaUpdateWrapper<RecReport> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.eq(RecReport::getId, update.getId())
+            .set(RecReport::getReportDate, update.getReportDate())
+            .set(RecReport::getReportType, update.getReportType())
+            .set(RecReport::getContent, update.getContent())
+            .set(RecReport::getSummary, update.getSummary())
+            .set(RecReport::getUpdateTime, new Date());
+        return baseMapper.update(updateWrapper) > 0;
     }
 
     /**
      * 保存前的数据校验
      */
     private void validEntityBeforeSave(RecReport entity){
-        //TODO 做一些数据校验,如唯一约束
+        boolean exists = baseMapper.exists(Wrappers.<RecReport>lambdaQuery()
+            .eq(RecReport::getReportType, entity.getReportType())
+            .eq(RecReport::getReportDate, entity.getReportDate())
+            .ne(entity.getId() != null, RecReport::getId, entity.getId()));
+        if (exists) {
+            throw new ServiceException("该报告已存在!");
+        }
     }
 
     /**
@@ -123,9 +133,6 @@ public class RecReportServiceImpl implements IRecReportService {
      */
     @Override
     public Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid) {
-        if(isValid){
-            //TODO 做一些业务上的校验,判断是否需要校验
-        }
         return baseMapper.deleteByIds(ids) > 0;
     }
 }

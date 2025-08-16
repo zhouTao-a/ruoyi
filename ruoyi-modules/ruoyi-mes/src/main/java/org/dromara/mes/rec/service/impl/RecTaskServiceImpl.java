@@ -120,7 +120,7 @@ public class RecTaskServiceImpl implements IRecTaskService {
         boolean exists = baseMapper.exists(Wrappers.<RecTask>lambdaQuery()
             .eq(RecTask::getTitle, entity.getTitle())
             .eq(RecTask::getUserId, entity.getUserId())
-            .eq(entity.getId() != null, RecTask::getId, entity.getId()));
+            .ne(entity.getId() != null, RecTask::getId, entity.getId()));
         if (exists) {
             throw new ServiceException("任务已存在!");
         }
