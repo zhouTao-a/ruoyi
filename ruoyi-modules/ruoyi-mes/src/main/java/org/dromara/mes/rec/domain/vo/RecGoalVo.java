@@ -34,8 +34,13 @@ public class RecGoalVo implements Serializable {
     /**
      * 父目标
      */
-    @ExcelProperty(value = "父目标")
     private Long parentId;
+
+    /**
+     * 父目标
+     */
+    @ExcelProperty(value = "父目标")
+    private Long parentTitle;
 
     /**
      * 标题
@@ -44,10 +49,10 @@ public class RecGoalVo implements Serializable {
     private String title;
 
     /**
-     * 描述
+     * 内容
      */
-    @ExcelProperty(value = "描述")
-    private String description;
+    @ExcelProperty(value = "内容")
+    private String content;
 
     /**
      * 进度

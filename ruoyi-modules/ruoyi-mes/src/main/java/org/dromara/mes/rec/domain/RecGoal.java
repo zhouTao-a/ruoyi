@@ -44,9 +44,9 @@ public class RecGoal extends TenantEntity {
     private String title;
 
     /**
-     * 描述
+     * 内容
      */
-    private String description;
+    private String content;
 
     /**
      * 进度

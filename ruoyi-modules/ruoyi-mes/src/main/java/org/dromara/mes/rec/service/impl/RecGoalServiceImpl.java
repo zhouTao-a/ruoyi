@@ -5,6 +5,7 @@ import org.dromara.common.core.utils.StringUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.RequiredArgsConstructor;
+import org.dromara.common.satoken.utils.LoginHelper;
 import org.springframework.stereotype.Service;
 import org.dromara.mes.rec.domain.bo.RecGoalBo;
 import org.dromara.mes.rec.domain.vo.RecGoalVo;
@@ -73,6 +74,8 @@ public class RecGoalServiceImpl implements IRecGoalService {
     @Override
     public Boolean insertByBo(RecGoalBo bo) {
         RecGoal add = MapstructUtils.convert(bo, RecGoal.class);
+        assert add != null;
+        add.setUserId(LoginHelper.getUserId());
         validEntityBeforeSave(add);
         return baseMapper.insert(add) > 0;
     }
