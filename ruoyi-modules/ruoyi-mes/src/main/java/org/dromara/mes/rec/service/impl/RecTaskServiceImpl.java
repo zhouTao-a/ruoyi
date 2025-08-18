@@ -85,8 +85,8 @@ public class RecTaskServiceImpl implements IRecTaskService {
     public Boolean insertByBo(RecTaskBo bo) {
         RecTask add = MapstructUtils.convert(bo, RecTask.class);
         assert add != null;
-        validEntityBeforeSave(add);
         add.setUserId(LoginHelper.getUserId());
+        validEntityBeforeSave(add);
         return baseMapper.insert(add) > 0;
     }
 

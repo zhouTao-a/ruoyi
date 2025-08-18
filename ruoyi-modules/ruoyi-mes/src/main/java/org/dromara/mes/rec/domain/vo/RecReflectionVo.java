@@ -36,9 +36,16 @@ public class RecReflectionVo implements Serializable {
     private String title;
 
     /**
-     * 内容
+     * 概要
      */
-    @ExcelProperty(value = "内容")
+    @ExcelProperty(value = "概要")
+    private String synopsis;
+
+
+    /**
+     * 感想
+     */
+    @ExcelProperty(value = "感想")
     private String content;
 
     /**

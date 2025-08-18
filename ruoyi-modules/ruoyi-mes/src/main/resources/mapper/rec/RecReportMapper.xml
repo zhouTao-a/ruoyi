@@ -26,7 +26,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="param.id != null">
                 and id = #{param.id}
             </if>
-            <if test="param.reportType != null">
+            <if test="param.reportType != null and param.reportType != ''">
                 and report_type = #{param.reportType}
             </if>
             <if test="param.beginReportDate != null">

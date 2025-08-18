@@ -4,4 +4,33 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.dromara.mes.rec.mapper.RecReflectionMapper">
 
+    <select id="queryPageList" resultType="org.dromara.mes.rec.domain.vo.RecReflectionVo">
+        select
+            id,
+            title,
+            synopsis,
+            content,
+            source_type as sourceType,
+            source_name as sourceName,
+            source_link as sourceLink,
+            user_id as userId,
+            create_time as createTime,
+            update_time as updateTime,
+            deleted_flag as deletedFlag
+        from mes_rec_reflection
+        <where>
+            deleted_flag = 0
+            and user_id = #{param.userId}
+            <if test="param.id != null">
+                and id = #{param.id}
+            </if>
+            <if test="param.sourceType != null and param.sourceType != ''">
+                and source_type = #{param.sourceType}
+            </if>
+            <if test="param.title != null and param.title != ''">
+                and title like concat('%', #{param.title}, '%')
+            </if>
+        </where>
+        order by create_time desc
+    </select>
 </mapper>

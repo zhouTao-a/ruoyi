@@ -38,7 +38,12 @@ public class RecReflection extends TenantEntity {
     private String title;
 
     /**
-     * 内容
+     * 概要
+     */
+    private String synopsis;
+
+    /**
+     * 感想
      */
     private String content;
 

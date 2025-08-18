@@ -29,12 +29,20 @@ public class RecReflectionBo extends BaseEntity {
      * 标题
      */
     @NotBlank(message = "标题不能为空", groups = { AddGroup.class, EditGroup.class })
+    @Size(max = 255, message = "标题长度不能超过255个字符")
     private String title;
 
     /**
-     * 内容
+     * 概要
      */
-    @NotBlank(message = "内容不能为空", groups = { AddGroup.class, EditGroup.class })
+    @Size(max = 20000, message = "概要长度不能超过1024个字符")
+    private String synopsis;
+
+    /**
+     * 感想
+     */
+    @NotBlank(message = "感想不能为空", groups = { AddGroup.class, EditGroup.class })
+    @Size(max = 20000, message = "感想长度不能超过20000个字符")
     private String content;
 
     /**
@@ -45,11 +53,13 @@ public class RecReflectionBo extends BaseEntity {
     /**
      * 来源名称
      */
+    @Size(max = 255, message = "来源名称长度不能超过255个字符")
     private String sourceName;
 
     /**
      * 来源链接
      */
+    @Size(max = 255, message = "来源链接长度不能超过255个字符")
     private String sourceLink;
 
     /**

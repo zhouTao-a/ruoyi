@@ -1,13 +1,14 @@
 package org.dromara.mes.rec.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.MapstructUtils;
-import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.RequiredArgsConstructor;
+import org.dromara.common.satoken.utils.LoginHelper;
 import org.springframework.stereotype.Service;
 import org.dromara.mes.rec.domain.bo.RecReflectionBo;
 import org.dromara.mes.rec.domain.vo.RecReflectionVo;
@@ -15,8 +16,8 @@ import org.dromara.mes.rec.domain.RecReflection;
 import org.dromara.mes.rec.mapper.RecReflectionMapper;
 import org.dromara.mes.rec.service.IRecReflectionService;
 
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Collection;
 
 /**
@@ -39,7 +40,9 @@ public class RecReflectionServiceImpl implements IRecReflectionService {
      */
     @Override
     public RecReflectionVo queryById(Long id){
-        return baseMapper.selectVoById(id);
+        RecReflectionBo bo = new RecReflectionBo();
+        bo.setId(id);
+        return queryPageList(bo, new PageQuery(1, 1)).getRows().get(0);
     }
 
     /**
@@ -51,8 +54,8 @@ public class RecReflectionServiceImpl implements IRecReflectionService {
      */
     @Override
     public TableDataInfo<RecReflectionVo> queryPageList(RecReflectionBo bo, PageQuery pageQuery) {
-        LambdaQueryWrapper<RecReflection> lqw = buildQueryWrapper(bo);
-        Page<RecReflectionVo> result = baseMapper.selectVoPage(pageQuery.build(), lqw);
+        bo.setUserId(LoginHelper.getUserId());
+        Page<RecReflectionVo> result = baseMapper.queryPageList(pageQuery.build(), bo);
         return TableDataInfo.build(result);
     }
 
@@ -64,16 +67,7 @@ public class RecReflectionServiceImpl implements IRecReflectionService {
      */
     @Override
     public List<RecReflectionVo> queryList(RecReflectionBo bo) {
-        LambdaQueryWrapper<RecReflection> lqw = buildQueryWrapper(bo);
-        return baseMapper.selectVoList(lqw);
-    }
-
-    private LambdaQueryWrapper<RecReflection> buildQueryWrapper(RecReflectionBo bo) {
-        Map<String, Object> params = bo.getParams();
-        LambdaQueryWrapper<RecReflection> lqw = Wrappers.lambdaQuery();
-        lqw.orderByAsc(RecReflection::getId);
-        lqw.eq(StringUtils.isNotBlank(bo.getTitle()), RecReflection::getTitle, bo.getTitle());
-        return lqw;
+        return queryPageList(bo, new PageQuery()).getRows();
     }
 
     /**
@@ -85,12 +79,10 @@ public class RecReflectionServiceImpl implements IRecReflectionService {
     @Override
     public Boolean insertByBo(RecReflectionBo bo) {
         RecReflection add = MapstructUtils.convert(bo, RecReflection.class);
+        assert add != null;
+        add.setUserId(LoginHelper.getUserId());
         validEntityBeforeSave(add);
-        boolean flag = baseMapper.insert(add) > 0;
-        if (flag) {
-            bo.setId(add.getId());
-        }
-        return flag;
+        return baseMapper.insert(add) > 0;
     }
 
     /**
@@ -102,15 +94,31 @@ public class RecReflectionServiceImpl implements IRecReflectionService {
     @Override
     public Boolean updateByBo(RecReflectionBo bo) {
         RecReflection update = MapstructUtils.convert(bo, RecReflection.class);
+        assert update != null;
         validEntityBeforeSave(update);
-        return baseMapper.updateById(update) > 0;
+        LambdaUpdateWrapper<RecReflection> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.eq(RecReflection::getId, update.getId())
+            .set(RecReflection::getTitle, update.getTitle())
+            .set(RecReflection::getSynopsis, update.getSynopsis())
+            .set(RecReflection::getContent, update.getContent())
+            .set(RecReflection::getSourceType, update.getSourceType())
+            .set(RecReflection::getSourceName, update.getSourceName())
+            .set(RecReflection::getSourceLink, update.getSourceLink())
+            .set(RecReflection::getUpdateTime, new Date());
+        return baseMapper.update(updateWrapper) > 0;
     }
 
     /**
      * 保存前的数据校验
      */
     private void validEntityBeforeSave(RecReflection entity){
-        //TODO 做一些数据校验,如唯一约束
+        boolean exists = baseMapper.exists(Wrappers.<RecReflection>lambdaQuery()
+            .eq(RecReflection::getTitle, entity.getTitle())
+            .eq(RecReflection::getUserId, entity.getUserId())
+            .ne(entity.getId() != null, RecReflection::getId, entity.getId()));
+        if (exists) {
+            throw new ServiceException("感想已存在!");
+        }
     }
 
     /**
@@ -122,9 +130,6 @@ public class RecReflectionServiceImpl implements IRecReflectionService {
      */
     @Override
     public Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid) {
-        if(isValid){
-            //TODO 做一些业务上的校验,判断是否需要校验
-        }
         return baseMapper.deleteByIds(ids) > 0;
     }
 }

@@ -85,8 +85,8 @@ public class RecReportServiceImpl implements IRecReportService {
     public Boolean insertByBo(RecReportBo bo) {
         RecReport add = MapstructUtils.convert(bo, RecReport.class);
         assert add != null;
-        validEntityBeforeSave(add);
         add.setUserId(LoginHelper.getUserId());
+        validEntityBeforeSave(add);
         return baseMapper.insert(add) > 0;
     }
 
