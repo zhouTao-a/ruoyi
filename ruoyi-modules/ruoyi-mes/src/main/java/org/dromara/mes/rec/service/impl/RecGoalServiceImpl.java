@@ -1,10 +1,14 @@
 package org.dromara.mes.rec.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.MapstructUtils;
-import org.dromara.common.core.utils.StringUtils;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.RequiredArgsConstructor;
+import org.dromara.common.mybatis.core.page.PageQuery;
+import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.springframework.stereotype.Service;
 import org.dromara.mes.rec.domain.bo.RecGoalBo;
@@ -13,9 +17,8 @@ import org.dromara.mes.rec.domain.RecGoal;
 import org.dromara.mes.rec.mapper.RecGoalMapper;
 import org.dromara.mes.rec.service.IRecGoalService;
 
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
-import java.util.Collection;
 
 /**
  * 目标Service业务层处理
@@ -48,21 +51,22 @@ public class RecGoalServiceImpl implements IRecGoalService {
      * @return 目标列表
      */
     @Override
-    public List<RecGoalVo> queryList(RecGoalBo bo) {
-        LambdaQueryWrapper<RecGoal> lqw = buildQueryWrapper(bo);
-        return baseMapper.selectVoList(lqw);
-    }
-
-    private LambdaQueryWrapper<RecGoal> buildQueryWrapper(RecGoalBo bo) {
-        Map<String, Object> params = bo.getParams();
-        LambdaQueryWrapper<RecGoal> lqw = Wrappers.lambdaQuery();
-        lqw.orderByAsc(RecGoal::getId);
-        lqw.eq(bo.getParentId() != null, RecGoal::getParentId, bo.getParentId());
-        lqw.like(StringUtils.isNotBlank(bo.getTitle()), RecGoal::getTitle, bo.getTitle());
-        lqw.eq(StringUtils.isNotBlank(bo.getStatus()), RecGoal::getStatus, bo.getStatus());
-        lqw.between(params.get("beginDeadline") != null && params.get("endDeadline") != null,
-            RecGoal::getDeadLine,params.get("beginDeadline"), params.get("endDeadline"));
-        return lqw;
+    public TableDataInfo<RecGoalVo> queryPageList(RecGoalBo bo, PageQuery pageQuery) {
+        bo.setUserId(LoginHelper.getUserId());
+        bo.setLevel(1);
+        Page<RecGoalVo> result = baseMapper.queryPageList(pageQuery.build(), bo);
+        TableDataInfo<RecGoalVo> build = TableDataInfo.build(result);
+        List<RecGoalVo> records = result.getRecords();
+        // 获取子目标
+        if (CollectionUtils.isNotEmpty(records)) {
+            List<Long> list = records.stream().map(RecGoalVo::getId).toList();
+            bo = new RecGoalBo();
+            bo.setUserId(LoginHelper.getUserId());
+            bo.setTopIds(list);
+            result = baseMapper.queryPageList(new PageQuery().build(), bo);
+            build.getRows().addAll(result.getRecords());
+        }
+        return build;
     }
 
     /**
@@ -89,15 +93,46 @@ public class RecGoalServiceImpl implements IRecGoalService {
     @Override
     public Boolean updateByBo(RecGoalBo bo) {
         RecGoal update = MapstructUtils.convert(bo, RecGoal.class);
+        assert update != null;
         validEntityBeforeSave(update);
-        return baseMapper.updateById(update) > 0;
+        // 设置父级目标
+        if (update.getParentId() != 0) {
+            RecGoalVo recGoalVo = baseMapper.selectVoById(update.getParentId());
+            update.setLevel(recGoalVo.getLevel() + 1);
+            if (recGoalVo.getTopId() != 0) {
+                update.setTopId(recGoalVo.getTopId());
+            } else {
+                update.setTopId(recGoalVo.getId());
+            }
+        }
+        LambdaUpdateWrapper<RecGoal> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.eq(RecGoal::getId, update.getId())
+            .set(RecGoal::getTitle, update.getTitle())
+            .set(RecGoal::getContent, update.getContent())
+            .set(RecGoal::getLevel, update.getLevel())
+            .set(RecGoal::getTopId, update.getTopId())
+            .set(RecGoal::getUserId, update.getUserId())
+            .set(RecGoal::getProgress, update.getProgress())
+            .set(RecGoal::getStatus, update.getStatus())
+            .set(RecGoal::getParentId, update.getParentId())
+            .set(RecGoal::getSortOrder, update.getSortOrder())
+            .set(RecGoal::getDeadLine, update.getDeadLine())
+            .set(RecGoal::getUpdateTime, new Date());
+        return baseMapper.update(updateWrapper) > 0;
     }
 
     /**
      * 保存前的数据校验
      */
     private void validEntityBeforeSave(RecGoal entity){
-        //TODO 做一些数据校验,如唯一约束
+        boolean exists = baseMapper.exists(Wrappers.<RecGoal>lambdaQuery()
+            .eq(RecGoal::getTitle, entity.getTitle())
+            .eq(RecGoal::getUserId, entity.getUserId())
+            .eq(RecGoal::getLevel, entity.getLevel())
+            .ne(entity.getId() != null, RecGoal::getId, entity.getId()));
+        if (exists) {
+            throw new ServiceException("目标已存在!");
+        }
     }
 
     /**
@@ -108,9 +143,13 @@ public class RecGoalServiceImpl implements IRecGoalService {
      * @return 是否删除成功
      */
     @Override
-    public Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid) {
-        if(isValid){
-            //TODO 做一些业务上的校验,判断是否需要校验
+    public Boolean deleteWithValidByIds(List<Long> ids, Boolean isValid) {
+        if (isValid) {
+            boolean exists = baseMapper.exists(Wrappers.<RecGoal>lambdaQuery().eq(RecGoal::getParentId, ids.get(0))
+                .eq(RecGoal::getUserId, LoginHelper.getUserId()));
+            if (exists) {
+                throw new ServiceException("目标下有子目标，请先删除子目标");
+            }
         }
         return baseMapper.deleteByIds(ids) > 0;
     }

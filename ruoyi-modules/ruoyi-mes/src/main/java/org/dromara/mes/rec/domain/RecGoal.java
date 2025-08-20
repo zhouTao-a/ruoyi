@@ -29,6 +29,16 @@ public class RecGoal extends TenantEntity {
     private Long id;
 
     /**
+     * 层级
+     */
+    private Integer level;
+
+    /**
+     * 顶层ID
+     */
+    private Long topId;
+
+    /**
      * 用户
      */
     private Long userId;

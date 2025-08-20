@@ -1,9 +1,10 @@
 package org.dromara.mes.rec.service;
 
+import org.dromara.common.mybatis.core.page.PageQuery;
+import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.mes.rec.domain.vo.RecGoalVo;
 import org.dromara.mes.rec.domain.bo.RecGoalBo;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -27,9 +28,10 @@ public interface IRecGoalService {
      * 查询符合条件的目标列表
      *
      * @param bo 查询条件
+     *        pageQuery 分页参数
      * @return 目标列表
      */
-    List<RecGoalVo> queryList(RecGoalBo bo);
+    TableDataInfo<RecGoalVo> queryPageList(RecGoalBo bo, PageQuery pageQuery);
 
     /**
      * 新增目标
@@ -54,5 +56,5 @@ public interface IRecGoalService {
      * @param isValid 是否进行有效性校验
      * @return 是否删除成功
      */
-    Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid);
+    Boolean deleteWithValidByIds(List<Long> ids, Boolean isValid);
 }

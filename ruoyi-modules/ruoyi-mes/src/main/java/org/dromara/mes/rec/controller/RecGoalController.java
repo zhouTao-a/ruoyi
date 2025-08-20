@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.*;
 import cn.dev33.satoken.annotation.SaCheckPermission;
+import org.dromara.common.mybatis.core.page.PageQuery;
+import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.validation.annotation.Validated;
 import org.dromara.common.idempotent.annotation.RepeatSubmit;
@@ -39,9 +41,8 @@ public class RecGoalController extends BaseController {
      */
     @SaCheckPermission("rec:recGoal:list")
     @GetMapping("/list")
-    public R<List<RecGoalVo>> list(RecGoalBo bo) {
-        List<RecGoalVo> list = recGoalService.queryList(bo);
-        return R.ok(list);
+    public TableDataInfo<RecGoalVo> list(RecGoalBo bo, PageQuery pageQuery) {
+        return recGoalService.queryPageList(bo, pageQuery);
     }
 
     /**
@@ -51,7 +52,7 @@ public class RecGoalController extends BaseController {
     @Log(title = "目标", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     public void export(RecGoalBo bo, HttpServletResponse response) {
-        List<RecGoalVo> list = recGoalService.queryList(bo);
+        List<RecGoalVo> list = recGoalService.queryPageList(bo, new PageQuery()).getRows();
         ExcelUtil.exportExcel(list, "目标", RecGoalVo.class, response);
     }
 

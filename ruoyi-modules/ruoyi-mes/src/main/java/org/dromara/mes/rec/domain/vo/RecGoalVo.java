@@ -32,15 +32,19 @@ public class RecGoalVo implements Serializable {
     private Long id;
 
     /**
-     * 父目标
+     * 层级
      */
-    private Long parentId;
+    private Integer level;
+
+    /**
+     * 顶层ID
+     */
+    private Long topId;
 
     /**
      * 父目标
      */
-    @ExcelProperty(value = "父目标")
-    private Long parentTitle;
+    private Long parentId;
 
     /**
      * 标题

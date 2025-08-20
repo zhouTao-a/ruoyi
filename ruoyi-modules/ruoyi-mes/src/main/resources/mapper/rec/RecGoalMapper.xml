@@ -4,4 +4,48 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.dromara.mes.rec.mapper.RecGoalMapper">
 
+    <select id="queryPageList" resultType="org.dromara.mes.rec.domain.vo.RecGoalVo">
+        select
+            id,
+            level,
+            top_id as topId,
+            parent_id as parentId,
+            title,
+            content,
+            progress,
+            status,
+            dead_line as deadLine,
+            sort_order as sortOrder,
+            user_id as userId
+        from mes_rec_goal
+        <where>
+            deleted_flag = 0
+            and user_id = #{param.userId}
+            <if test="param.id != null">
+                and id = #{param.id}
+            </if>
+            <if test="param.level != null">
+                and level = #{param.level}
+            </if>
+            <if test="param.topIds != null and param.topIds.size > 0">
+                and top_id in
+                <foreach collection="param.topIds" item="id" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+            </if>
+            <if test="param.title != null and param.title != ''">
+                and title like concat('%', #{param.title}, '%')
+            </if>
+            <if test="param.status != null and param.status != ''">
+                and status = #{param.status}
+            </if>
+            <if test="param.beginDeadLine != null">
+                and dead_line >= #{param.beginDeadLine}
+            </if>
+            <if test="param.endDeadLine != null">
+                and #{param.endDeadLine} > dead_line
+            </if>
+        </where>
+        order by sort_order asc
+    </select>
 </mapper>
