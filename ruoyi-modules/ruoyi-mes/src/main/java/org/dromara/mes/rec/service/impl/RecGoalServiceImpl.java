@@ -80,8 +80,22 @@ public class RecGoalServiceImpl implements IRecGoalService {
         RecGoal add = MapstructUtils.convert(bo, RecGoal.class);
         assert add != null;
         add.setUserId(LoginHelper.getUserId());
+        // 设置父级目标
+        setParentAndTopId(add);
         validEntityBeforeSave(add);
         return baseMapper.insert(add) > 0;
+    }
+
+    private void setParentAndTopId(RecGoal add) {
+        if (add.getParentId() != 0) {
+            RecGoalVo recGoalVo = baseMapper.selectVoById(add.getParentId());
+            add.setLevel(recGoalVo.getLevel() + 1);
+            if (recGoalVo.getTopId() != 0) {
+                add.setTopId(recGoalVo.getTopId());
+            } else {
+                add.setTopId(recGoalVo.getId());
+            }
+        }
     }
 
     /**
@@ -96,15 +110,7 @@ public class RecGoalServiceImpl implements IRecGoalService {
         assert update != null;
         validEntityBeforeSave(update);
         // 设置父级目标
-        if (update.getParentId() != 0) {
-            RecGoalVo recGoalVo = baseMapper.selectVoById(update.getParentId());
-            update.setLevel(recGoalVo.getLevel() + 1);
-            if (recGoalVo.getTopId() != 0) {
-                update.setTopId(recGoalVo.getTopId());
-            } else {
-                update.setTopId(recGoalVo.getId());
-            }
-        }
+        setParentAndTopId(update);
         LambdaUpdateWrapper<RecGoal> updateWrapper = new LambdaUpdateWrapper<>();
         updateWrapper.eq(RecGoal::getId, update.getId())
             .set(RecGoal::getTitle, update.getTitle())

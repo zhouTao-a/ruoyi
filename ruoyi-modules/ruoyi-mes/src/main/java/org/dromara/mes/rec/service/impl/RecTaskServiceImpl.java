@@ -104,7 +104,7 @@ public class RecTaskServiceImpl implements IRecTaskService {
         LambdaUpdateWrapper<RecTask> updateWrapper = new LambdaUpdateWrapper<>();
         updateWrapper.eq(RecTask::getId, update.getId())
             .set(RecTask::getTitle, update.getTitle())
-            .set(RecTask::getDescription, update.getDescription())
+            .set(RecTask::getContent, update.getContent())
             .set(RecTask::getStatus, update.getStatus())
             .set(RecTask::getProgress, update.getProgress())
             .set(RecTask::getDeadLine, update.getDeadLine())

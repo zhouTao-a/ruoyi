@@ -43,7 +43,7 @@ public class RecTaskVo implements Serializable {
      * 描述
      */
     @ExcelProperty(value = "描述")
-    private String description;
+    private String content;
 
     /**
      * 状态

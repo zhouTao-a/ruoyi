@@ -67,5 +67,10 @@ public class RecReflectionBo extends BaseEntity {
      */
     private Long userId;
 
+    /**
+     * 是否随机
+     */
+    private boolean randomFlag = false;
+
 
 }

@@ -41,7 +41,7 @@ public class RecTask extends TenantEntity {
     /**
      * 描述
      */
-    private String description;
+    private String content;
 
     /**
      * 状态
