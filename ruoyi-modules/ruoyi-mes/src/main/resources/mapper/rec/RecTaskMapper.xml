@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.dromara.mes.rec.mapper.RecTaskMapper">
+
+    <select id="queryPageList" resultType="org.dromara.mes.rec.domain.vo.RecTaskVo">
+        select
+            m.id,
+            m.title,
+            m.content,
+            m.status,
+            m.progress,
+            m.dead_line,
+            m.priority,
+            m.create_dept,
+            m.create_by,
+            m.create_time,
+            m.update_by,
+            m.update_time,
+            m.deleted_flag,
+            m.tenant_id
+        from mes_rec_task m
+        <where>
+            m.deleted_flag = 0
+            and m.user_id = #{param.userId}
+            <if test="param.id != null">
+                and m.id = #{param.id}
+            </if>
+            <if test="param.title != null and param.title != ''">
+                and m.title like concat('%', #{param.title}, '%')
+            </if>
+            <if test="param.status != null and param.status != ''">
+                and m.status = #{param.status}
+            </if>
+            <if test="param.beginDeadLine != null">
+                and m.dead_line >= #{param.beginDeadLine}
+            </if>
+            <if test="param.endDeadLine != null">
+                and #{param.endDeadLine} > m.dead_line
+            </if>
+        </where>
+        order by m.update_time desc
+    </select>
+</mapper>

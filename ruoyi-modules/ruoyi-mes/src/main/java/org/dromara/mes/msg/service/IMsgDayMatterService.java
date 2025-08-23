@@ -5,6 +5,7 @@ import org.dromara.mes.msg.domain.vo.MsgDayMatterVo;
 import org.dromara.mes.msg.domain.bo.MsgDayMatterBo;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.mybatis.core.page.PageQuery;
+import org.dromara.mes.msg.domain.vo.ReminderVo;
 
 import java.util.Collection;
 import java.util.List;
@@ -75,4 +76,19 @@ public interface IMsgDayMatterService {
      * @return 事件名称列表
      */
     List<MsgDayMatterNameVo> queryDayNameList(String dayName, String id, PageQuery pageQuery);
+
+    /**
+     * 查询事件列表
+     *
+     * @param year    年
+     * @param month   月
+     * @param groupId 分组id
+     * @return 事件列表
+     */
+    List<ReminderVo> dayMatterList(int year, int month, Long groupId);
+
+    /**
+     * 定时更新下次提醒时间
+     */
+    void updateNextNotifyTime();
 }

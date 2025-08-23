@@ -57,6 +57,7 @@ public class SecurityConfig implements WebMvcConfigurer {
                         try {
                             StpUtil.checkLogin();
                         } catch (NotLoginException e) {
+                            assert request != null;
                             if (request.getRequestURI().contains("sse")) {
                                 throw new SseException(e.getMessage(), e.getCode());
                             } else {
@@ -65,6 +66,7 @@ public class SecurityConfig implements WebMvcConfigurer {
                         }
 
                         // 检查 header 与 param 里的 clientid 与 token 里的是否一致
+                        assert request != null;
                         String headerCid = request.getHeader(LoginHelper.CLIENT_KEY);
                         String paramCid = ServletUtils.getParameter(LoginHelper.CLIENT_KEY);
                         String clientId = StpUtil.getExtra(LoginHelper.CLIENT_KEY).toString();
@@ -96,9 +98,7 @@ public class SecurityConfig implements WebMvcConfigurer {
         String password = SpringUtils.getProperty("spring.boot.admin.client.password");
         return new SaServletFilter()
             .addInclude("/actuator", "/actuator/**")
-            .setAuth(obj -> {
-                SaHttpBasicUtil.check(username + ":" + password);
-            })
+            .setAuth(obj -> SaHttpBasicUtil.check(username + ":" + password))
             .setError(e -> SaResult.error(e.getMessage()).setCode(HttpStatus.UNAUTHORIZED));
     }
 

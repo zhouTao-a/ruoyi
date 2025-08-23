@@ -126,10 +126,10 @@ public class MsgUserServiceImpl implements IMsgUserService {
      * 保存前的数据校验
      */
     private void validEntityBeforeSave(MsgUserBo entity){
-        List<MsgUserVo> msgUserVos = baseMapper.selectVoList(Wrappers.<MsgUser>lambdaQuery()
+        boolean exists = baseMapper.exists(Wrappers.<MsgUser>lambdaQuery()
             .eq(MsgUser::getUserCode, entity.getUserCode())
             .ne(entity.getId() != null, MsgUser::getId, entity.getId()));
-        if (!msgUserVos.isEmpty()) {
+        if (exists) {
             throw new ServiceException("用户代码不能重复!");
         }
     }

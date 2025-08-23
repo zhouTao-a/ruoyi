@@ -31,6 +31,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="param.dayType != null and param.dayType != ''">
                 and m.day_type = #{param.dayType}
             </if>
+            <if test="param.notifyStartTime != null">
+                and m.next_notify_time >= #{param.notifyStartTime}
+            </if>
+            <if test="param.notifyEndTime != null">
+                and #{param.notifyEndTime} > m.next_notify_time
+            </if>
             <if test="param.userId != null">
                 and m.user_id = #{param.userId}
             </if>

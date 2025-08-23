@@ -81,11 +81,25 @@ public class MsgDayMatterBo extends BaseEntity {
      */
     private Date nextNotifyTime;
 
+
+    /**
+     * 下次通知时间
+     */
+    private Date notifyStartTime;
+
+    /**
+     * 下次通知时间
+     */
+    private Date notifyEndTime;
+
     /**
      * 所属用户ID
      */
     private Long userId;
 
+    /**
+     * 此方法与 MsgDayMatterVo 一样，如有修改需同步其他类
+     */
     // 自动计算下次通知时间 （农历支持每年循环即可）
     public void calculateNextNotifyTime() {
         if (dayTarget == null || remindType == null || remindType.isBlank()) {
