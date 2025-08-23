@@ -56,7 +56,7 @@ public class IpWhiteListAspect {
         if (ipWhiteList == null) {
             ipWhiteList = new IpWhiteList();
             ipWhiteList.setIpAddress(ip);
-            ipWhiteList.setStatus(0);
+            ipWhiteList.setStatus(1);
             ipWhiteList.setRemark("系统自动加入待授权");
             ipWhiteListMapper.insert(ipWhiteList);
         }
