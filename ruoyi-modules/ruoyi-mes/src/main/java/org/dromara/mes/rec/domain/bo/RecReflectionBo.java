@@ -41,7 +41,6 @@ public class RecReflectionBo extends BaseEntity {
     /**
      * 感想
      */
-    @NotBlank(message = "感想不能为空", groups = { AddGroup.class, EditGroup.class })
     @Size(max = 20000, message = "感想长度不能超过20000个字符")
     private String content;
 
