@@ -65,4 +65,9 @@ public interface IIpWhiteListService {
      * @return 是否删除成功
      */
     Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid);
+
+    /**
+     * 刷新IP白名单
+     */
+    void refreshIpWhite();
 }

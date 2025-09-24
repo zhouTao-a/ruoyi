@@ -8,6 +8,7 @@ import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.dromara.common.redis.utils.RedisUtils;
 import org.dromara.mes.system.domain.IpWhiteList;
+import org.dromara.mes.system.init.IpWhiteAccessControl;
 import org.dromara.mes.system.mapper.IpWhiteListMapper;
 import org.dromara.mes.utils.IpUtils;
 import org.springframework.stereotype.Component;
@@ -25,6 +26,9 @@ public class IpWhiteListAspect {
     @Resource
     private IpWhiteListMapper ipWhiteListMapper;
 
+    @Resource
+    private IpWhiteAccessControl ipWhiteAccessControl;
+
     private static final String REDIS_KEY = "ip:white:list";
 
     @Pointcut("@annotation(org.dromara.web.annotation.CheckIpWhiteList)")
@@ -36,6 +40,11 @@ public class IpWhiteListAspect {
 
         // 判断是否是内网IP，如果是就直接放行
         if (isInternalIp(ip)) {
+            return;
+        }
+
+        // 判断是否在白名单
+        if (ipWhiteAccessControl.isIpWhite(ip)) {
             return;
         }
 
@@ -59,6 +68,7 @@ public class IpWhiteListAspect {
             ipWhiteList.setStatus(0);
             ipWhiteList.setRemark("系统自动加入待授权");
             ipWhiteListMapper.insert(ipWhiteList);
+            ipWhiteAccessControl.addIpWhite(ip);
         }
         throw new SecurityException("IP未授权,请联系后台管理员授权后再次登录！");
     }

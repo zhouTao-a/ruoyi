@@ -3,6 +3,7 @@ package org.dromara.system.mapper;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.dromara.common.mybatis.annotation.DataColumn;
 import org.dromara.common.mybatis.annotation.DataPermission;
@@ -18,6 +19,7 @@ import java.util.List;
  *
  * @author Lion Li
  */
+@Mapper
 public interface SysUserMapper extends BaseMapperPlus<SysUser, SysUserVo> {
 
     /**

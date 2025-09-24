@@ -2,17 +2,20 @@ package org.dromara.mes.system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.MapstructUtils;
+import org.dromara.common.core.utils.ObjectUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.mes.system.domain.IpWhiteList;
 import org.dromara.mes.system.domain.bo.IpWhiteListBo;
 import org.dromara.mes.system.domain.vo.IpWhiteListVo;
+import org.dromara.mes.system.init.IpWhiteAccessControl;
 import org.dromara.mes.system.mapper.IpWhiteListMapper;
 import org.dromara.mes.system.service.IIpWhiteListService;
 import org.springframework.stereotype.Service;
@@ -32,6 +35,8 @@ import java.util.List;
 public class IpWhiteListServiceImpl implements IIpWhiteListService {
 
     private final IpWhiteListMapper baseMapper;
+
+    private final IpWhiteAccessControl ipWhiteAccessControl;
 
     /**
      * 查询IP白名单
@@ -95,6 +100,7 @@ public class IpWhiteListServiceImpl implements IIpWhiteListService {
             assert add != null;
             bo.setId(add.getId());
         }
+        refreshIpWhite();
         return flag;
     }
 
@@ -107,6 +113,7 @@ public class IpWhiteListServiceImpl implements IIpWhiteListService {
     @Override
     public Boolean updateByBo(IpWhiteListBo bo) {
         validEntityBeforeSave(bo);
+        IpWhiteList ipWhiteList = baseMapper.selectById(bo.getId());
         LambdaUpdateWrapper<IpWhiteList> update = new LambdaUpdateWrapper<>();
         update.eq(IpWhiteList::getId, bo.getId())
             .set(IpWhiteList::getIpAddress, bo.getIpAddress())
@@ -114,7 +121,11 @@ public class IpWhiteListServiceImpl implements IIpWhiteListService {
             .set(IpWhiteList::getStatus, bo.getStatus())
             .set(IpWhiteList::getRemark, bo.getRemark())
             .set(IpWhiteList::getUpdateTime, new Date());
-        return baseMapper.update(update) > 0;
+        boolean b = baseMapper.update(update) > 0;
+        if (!ObjectUtils.equals(ipWhiteList.getIpAddress(), bo.getIpAddress())) {
+            refreshIpWhite();
+        }
+        return b;
     }
 
     /**
@@ -138,6 +149,19 @@ public class IpWhiteListServiceImpl implements IIpWhiteListService {
      */
     @Override
     public Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid) {
-        return baseMapper.deleteByIds(ids) > 0;
+        boolean b = baseMapper.deleteByIds(ids) > 0;
+        refreshIpWhite();
+        return b;
+    }
+
+    @Override
+    public void refreshIpWhite() {
+        // 添加白名单
+        List<IpWhiteList> ipWhiteLists = baseMapper.selectList(new LambdaQueryWrapper<>(IpWhiteList.class)
+            .eq(IpWhiteList::getStatus, 1).isNotNull(IpWhiteList::getIpAddress));
+        if (CollectionUtils.isNotEmpty(ipWhiteLists)) {
+            ipWhiteAccessControl.refreshIpWhite(ipWhiteLists.stream().map(IpWhiteList::getIpAddress).toList());
+        }
     }
 }
+
