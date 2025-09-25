@@ -1,0 +1,15 @@
+@baseUrl = http://localhost:8080
+
+### 幻读测试 SELECT ... FOR UPDATE
+GET {{baseUrl}}/phantomRead/selectForUpdate
+Content-Type: application/json
+
+
+
+### 幻读测试 SELECT ... LOCK IN SHARE MODE
+GET {{baseUrl}}/phantomRead/selectForShare
+Content-Type: application/json
+
+
+
+

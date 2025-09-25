@@ -1,5 +1,6 @@
 package org.dromara.mes.rec.service;
 
+import org.dromara.mes.rec.domain.RecReflection;
 import org.dromara.mes.rec.domain.vo.RecReflectionVo;
 import org.dromara.mes.rec.domain.bo.RecReflectionBo;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
@@ -65,4 +66,20 @@ public interface IRecReflectionService {
      * @return 是否删除成功
      */
     Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid);
+
+    /**
+     * 幻读测试 select ... for update
+     */
+    List<RecReflection> selectForUpdate();
+
+    /**
+     * 删除ById
+     * @param id  id
+     */
+    void deleteById(Long id);
+
+    /**
+     * 幻读测试 select ... LOCK IN SHARE MODE / FOR SHARE
+     */
+    List<RecReflection> selectForShare();
 }

@@ -132,4 +132,19 @@ public class RecReflectionServiceImpl implements IRecReflectionService {
     public Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid) {
         return baseMapper.deleteByIds(ids) > 0;
     }
+
+    @Override
+    public List<RecReflection> selectForUpdate() {
+        return baseMapper.selectForUpdate();
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        baseMapper.deleteSqlById(id);
+    }
+
+    @Override
+    public List<RecReflection> selectForShare() {
+        return baseMapper.selectForShare();
+    }
 }

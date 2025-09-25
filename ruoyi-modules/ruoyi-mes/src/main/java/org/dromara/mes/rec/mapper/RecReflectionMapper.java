@@ -8,6 +8,8 @@ import org.dromara.mes.rec.domain.bo.RecReflectionBo;
 import org.dromara.mes.rec.domain.vo.RecReflectionVo;
 import org.dromara.common.mybatis.core.mapper.BaseMapperPlus;
 
+import java.util.List;
+
 /**
  * 感想Mapper接口
  *
@@ -25,4 +27,21 @@ public interface RecReflectionMapper extends BaseMapperPlus<RecReflection, RecRe
      */
     Page<RecReflectionVo> queryPageList(Page<Object> build,
                                         @Param("param") RecReflectionBo param);
+
+    /**
+     * 幻读测试 select ... for update
+     */
+    List<RecReflection> selectForUpdate();
+
+    /**
+     * 删除数据
+     *
+     * @param id 主键
+     */
+    void deleteSqlById(Long id);
+
+    /**
+     * 幻读测试 select ... LOCK IN SHARE MODE/ FOR SHARE
+     */
+    List<RecReflection> selectForShare();
 }
