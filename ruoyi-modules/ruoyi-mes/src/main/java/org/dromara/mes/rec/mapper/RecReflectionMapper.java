@@ -3,6 +3,7 @@ package org.dromara.mes.rec.mapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Update;
 import org.dromara.mes.rec.domain.RecReflection;
 import org.dromara.mes.rec.domain.bo.RecReflectionBo;
 import org.dromara.mes.rec.domain.vo.RecReflectionVo;
@@ -44,4 +45,22 @@ public interface RecReflectionMapper extends BaseMapperPlus<RecReflection, RecRe
      * 幻读测试 select ... LOCK IN SHARE MODE/ FOR SHARE
      */
     List<RecReflection> selectForShare();
+
+    /**
+     * 批量更新测试数据
+     *
+     * @param start 开始
+     * @param end   结束
+     */
+    @Update("update mes_rec_reflection set title = '范围更新' where id > #{start} and id <= #{end}")
+    void updateTestDataRange(long start, long end);
+
+    /**
+     * 批量删除测试数据
+     *
+     * @param start 删除开始
+     * @param end   删除结束
+     */
+    @Update("delete from mes_rec_reflection where id > #{start} and id <= #{end}")
+    void deleteTestDataRange(long start, long end);
 }
