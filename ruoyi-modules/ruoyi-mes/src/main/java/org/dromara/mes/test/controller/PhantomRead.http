@@ -5,6 +5,11 @@ GET {{baseUrl}}/phantomRead/selectForUpdate
 Content-Type: application/json
 
 
+### 幻读测试 SELECT ... FOR UPDATE
+GET {{baseUrl}}/phantomRead/selectForUpdateRange
+Content-Type: application/json
+
+
 
 ### 幻读测试 SELECT ... LOCK IN SHARE MODE
 GET {{baseUrl}}/phantomRead/selectForShare
@@ -24,6 +29,10 @@ Content-Type: application/json
 
 ### 当前读测试 范围删除数据 触发间隙锁
 GET {{baseUrl}}/phantomRead/deleteByRange
+Content-Type: application/json
+
+### 锁范围与当前读区间不一致
+GET {{baseUrl}}/phantomRead/deleteByRange1
 Content-Type: application/json
 
 ### 当前读测试 插入数据

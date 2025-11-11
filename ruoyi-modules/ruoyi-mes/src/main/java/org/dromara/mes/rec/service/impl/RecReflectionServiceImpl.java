@@ -134,8 +134,8 @@ public class RecReflectionServiceImpl implements IRecReflectionService {
     }
 
     @Override
-    public List<RecReflection> selectForUpdate() {
-        return baseMapper.selectForUpdate();
+    public List<RecReflection> selectForUpdate(long start, long end) {
+        return baseMapper.selectForUpdate(start, end);
     }
 
     @Override

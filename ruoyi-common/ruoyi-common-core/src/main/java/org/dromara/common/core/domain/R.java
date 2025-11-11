@@ -100,11 +100,11 @@ public class R<T> implements Serializable {
         return r;
     }
 
-    public static <T> Boolean isError(R<T> ret) {
+    public static <T> boolean isError(R<T> ret) {
         return !isSuccess(ret);
     }
 
-    public static <T> Boolean isSuccess(R<T> ret) {
+    public static <T> boolean isSuccess(R<T> ret) {
         return R.SUCCESS == ret.getCode();
     }
 }

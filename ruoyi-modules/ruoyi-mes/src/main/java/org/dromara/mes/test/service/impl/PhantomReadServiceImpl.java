@@ -10,6 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static java.lang.Thread.sleep;
+
 @Service
 @RequiredArgsConstructor
 public class PhantomReadServiceImpl implements IPhantomReadService {
@@ -49,6 +51,11 @@ public class PhantomReadServiceImpl implements IPhantomReadService {
         r.setSourceLink(string);
         r.setId(l);
         recReflectionMapper.insert(r);
+        try {
+            sleep(1000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

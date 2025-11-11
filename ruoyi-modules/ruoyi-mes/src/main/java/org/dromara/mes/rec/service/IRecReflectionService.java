@@ -70,7 +70,7 @@ public interface IRecReflectionService {
     /**
      * 幻读测试 select ... for update
      */
-    List<RecReflection> selectForUpdate();
+    List<RecReflection> selectForUpdate(long start, long end);
 
     /**
      * 删除ById

@@ -32,7 +32,8 @@ public interface RecReflectionMapper extends BaseMapperPlus<RecReflection, RecRe
     /**
      * 幻读测试 select ... for update
      */
-    List<RecReflection> selectForUpdate();
+    List<RecReflection> selectForUpdate(@Param("start") long start,
+                                        @Param("end") long end);
 
     /**
      * 删除数据
