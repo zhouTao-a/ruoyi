@@ -1,26 +1,27 @@
 package org.dromara.mes.rec.controller;
 
-import java.util.List;
-
-import lombok.RequiredArgsConstructor;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.constraints.*;
 import cn.dev33.satoken.annotation.SaCheckPermission;
-import org.dromara.common.mybatis.core.page.PageQuery;
-import org.dromara.common.mybatis.core.page.TableDataInfo;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.validation.annotation.Validated;
-import org.dromara.common.idempotent.annotation.RepeatSubmit;
-import org.dromara.common.log.annotation.Log;
-import org.dromara.common.web.core.BaseController;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.core.validate.AddGroup;
 import org.dromara.common.core.validate.EditGroup;
-import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.excel.utils.ExcelUtil;
-import org.dromara.mes.rec.domain.vo.RecGoalVo;
+import org.dromara.common.idempotent.annotation.RepeatSubmit;
+import org.dromara.common.log.annotation.Log;
+import org.dromara.common.log.enums.BusinessType;
+import org.dromara.common.mybatis.core.page.PageQuery;
+import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.common.web.core.BaseController;
 import org.dromara.mes.rec.domain.bo.RecGoalBo;
+import org.dromara.mes.rec.domain.vo.RecGoalVo;
 import org.dromara.mes.rec.service.IRecGoalService;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * 目标
@@ -40,7 +41,7 @@ public class RecGoalController extends BaseController {
      * 查询目标列表
      */
     @SaCheckPermission("rec:recGoal:list")
-    @GetMapping("/list")
+    @GetMapping(value = "/list")
     public TableDataInfo<RecGoalVo> list(RecGoalBo bo, PageQuery pageQuery) {
         return recGoalService.queryPageList(bo, pageQuery);
     }
