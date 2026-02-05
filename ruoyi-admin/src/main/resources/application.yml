@@ -114,6 +114,8 @@ security:
     - /notice/refresh
     - /msg/msgDayMatter/dayMatterList
     - /phantomRead/**
+    - /callback
+    - /sso/check
 
 # 多租户配置
 tenant:

@@ -63,9 +63,14 @@ public class SocialLoginConfigProperties {
     private String clientOsType;
 
     /**
-     * maxkey 服务器地址
+     * maxkey/keycloak 服务器地址
      */
     private String serverUrl;
+
+    /**
+     * keycloak 领域
+     */
+    private String realm;
 
     /**
      * 请求范围

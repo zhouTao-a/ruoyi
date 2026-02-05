@@ -12,6 +12,8 @@ import org.dromara.common.social.config.properties.SocialLoginConfigProperties;
 import org.dromara.common.social.config.properties.SocialProperties;
 import org.dromara.common.social.maxkey.AuthMaxKeyRequest;
 import org.dromara.common.social.topiam.AuthTopIamRequest;
+import org.dromara.common.social.keycloak.AuthKeycloakRequest;
+import org.dromara.common.social.utils.AuthRedisStateCache;
 
 /**
  * 认证授权工具类
@@ -41,6 +43,13 @@ public class SocialUtils  {
             .clientSecret(obj.getClientSecret())
             .redirectUri(obj.getRedirectUri())
             .scopes(obj.getScopes());
+        
+        // Set Keycloak specific properties if needed
+        if ("keycloak".equals(source.toLowerCase())) {
+            AuthKeycloakRequest.SERVER_URL = obj.getServerUrl();
+            AuthKeycloakRequest.REALM = obj.getRealm();
+        }
+        
         return switch (source.toLowerCase()) {
             case "dingtalk" -> new AuthDingTalkRequest(builder.build(), STATE_CACHE);
             case "baidu" -> new AuthBaiduRequest(builder.build(), STATE_CACHE);
@@ -66,6 +75,7 @@ public class SocialUtils  {
             case "aliyun" -> new AuthAliyunRequest(builder.build(), STATE_CACHE);
             case "maxkey" -> new AuthMaxKeyRequest(builder.build(), STATE_CACHE);
             case "topiam" -> new AuthTopIamRequest(builder.build(), STATE_CACHE);
+            case "keycloak" -> new AuthKeycloakRequest(builder.build(), STATE_CACHE);
             default -> throw new AuthException("未获取到有效的Auth配置");
         };
     }
