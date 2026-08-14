@@ -137,4 +137,17 @@ public class RecTaskServiceImpl implements IRecTaskService {
     public Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid) {
         return baseMapper.deleteByIds(ids) > 0;
     }
+
+    @Override
+    public Boolean updateStatusByIds(List<Long> ids, String status) {
+        LambdaUpdateWrapper<RecTask> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.in(RecTask::getId, ids)
+            .eq(RecTask::getUserId, LoginHelper.getUserId())
+            .set(RecTask::getStatus, status)
+            .set(RecTask::getUpdateTime, new Date());
+        if ("completed".equals(status)) {
+            updateWrapper.set(RecTask::getProgress, 100L);
+        }
+        return baseMapper.update(updateWrapper) > 0;
+    }
 }

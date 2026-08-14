@@ -56,4 +56,25 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </if>
         order by next_notify_time desc
     </select>
+
+    <select id="selectLatestOne" resultType="org.dromara.mes.msg.domain.vo.MsgDayMatterVo">
+        select
+            m.id,
+            m.day_name,
+            m.day_target,
+            m.day_lunar,
+            m.day_type,
+            m.remind_type,
+            m.repeat_flag,
+            m.notify_status,
+            m.next_notify_time,
+            m.user_id,
+            u.user_name,
+            u.user_code
+        from mes_msg_day_matter m
+        left join mes_msg_user u on m.user_id = u.id and u.deleted_flag = '0'
+        where m.deleted_flag = '0'
+        order by m.create_time desc, m.id desc
+        limit 1
+    </select>
 </mapper>

@@ -110,21 +110,21 @@ redisson:
     # 发布和订阅连接池大小
     subscriptionConnectionPoolSize: 50
 
---- # mail 邮件发送
+--- # mail 邮件发送（QQ 邮箱 SMTP）
 mail:
-  enabled: false
-  host: smtp.163.com
+  enabled: true
+  host: smtp.qq.com
   port: 465
   # 是否需要用户名密码验证
   auth: true
   # 发送方，遵循RFC-822标准
-  from: xxx@163.com
-  # 用户名（注意：如果使用foxmail邮箱，此处user为qq号）
-  user: xxx@163.com
-  # 密码（注意，某些邮箱需要为SMTP服务单独设置密码，详情查看相关帮助）
-  pass: xxxxxxxxxx
-  # 使用 STARTTLS安全连接，STARTTLS是对纯文本通信协议的扩展。
-  starttlsEnable: true
+  from: 2037214982@qq.com
+  # 用户名（QQ 邮箱填完整邮箱）
+  user: 2037214982@qq.com
+  # QQ 邮箱 SMTP 授权码（不是登录密码）。可设环境变量 MAIL_QQ_PASS，勿提交真实授权码
+  pass:
+  # 465 走 SSL，不要开 STARTTLS
+  starttlsEnable: false
   # 使用SSL安全连接
   sslEnable: true
   # SMTP超时时长，单位毫秒，缺省值不超时

@@ -7,7 +7,7 @@ import org.dromara.mes.msg.service.IMsgDayMatterService;
 import org.springframework.stereotype.Component;
 
 /**
- * 定时更新下次执行时间
+ * 扫描到期事件：发送邮件后滚动下次通知时间。建议每分钟执行一次。
  */
 @Component
 @JobExecutor(name = "MsgDayMatterJobExecutor")
@@ -18,6 +18,6 @@ public class MsgDayMatterJobExecutor {
 
     public ExecuteResult jobExecute() {
         service.updateNextNotifyTime();
-        return ExecuteResult.success("更新成功");
+        return ExecuteResult.success("处理成功");
     }
 }

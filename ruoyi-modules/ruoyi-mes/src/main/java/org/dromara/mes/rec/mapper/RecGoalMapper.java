@@ -8,6 +8,9 @@ import org.dromara.mes.rec.domain.bo.RecGoalBo;
 import org.dromara.mes.rec.domain.vo.RecGoalVo;
 import org.dromara.common.mybatis.core.mapper.BaseMapperPlus;
 
+import java.util.Date;
+import java.util.List;
+
 /**
  * 目标Mapper接口
  *
@@ -26,4 +29,15 @@ public interface RecGoalMapper extends BaseMapperPlus<RecGoal, RecGoalVo> {
      */
     Page<RecGoalVo> queryPageList(Page<Object> build,
                                   @Param("param") RecGoalBo bo);
+
+    /**
+     * 当天相关目标：未完成，且逾期或仍在截止日期内（含无截止日期）
+     */
+    List<RecGoalVo> selectCurrentByUserId(@Param("userId") Long userId,
+                                          @Param("todayStart") Date todayStart);
+
+    /**
+     * 最近一条目标
+     */
+    RecGoalVo selectLatestOne(@Param("userId") Long userId);
 }

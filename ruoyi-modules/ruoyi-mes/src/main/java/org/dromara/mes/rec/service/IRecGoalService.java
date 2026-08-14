@@ -57,4 +57,9 @@ public interface IRecGoalService {
      * @return 是否删除成功
      */
     Boolean deleteWithValidByIds(List<Long> ids, Boolean isValid);
+
+    /**
+     * 批量修改状态（仅当前登录用户的数据）
+     */
+    Boolean updateStatusByIds(List<Long> ids, String status);
 }

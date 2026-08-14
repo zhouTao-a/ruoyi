@@ -16,6 +16,7 @@ import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.web.core.BaseController;
 import org.dromara.mes.rec.domain.bo.RecGoalBo;
+import org.dromara.mes.rec.domain.bo.RecBatchStatusBo;
 import org.dromara.mes.rec.domain.vo.RecGoalVo;
 import org.dromara.mes.rec.service.IRecGoalService;
 import org.springframework.validation.annotation.Validated;
@@ -89,6 +90,16 @@ public class RecGoalController extends BaseController {
     @PutMapping()
     public R<Void> edit(@Validated(EditGroup.class) @RequestBody RecGoalBo bo) {
         return toAjax(recGoalService.updateByBo(bo));
+    }
+
+    /**
+     * 批量修改目标状态
+     */
+    @SaCheckPermission("rec:recGoal:edit")
+    @Log(title = "目标", businessType = BusinessType.UPDATE)
+    @PutMapping("/batchStatus")
+    public R<Void> batchStatus(@Validated @RequestBody RecBatchStatusBo bo) {
+        return toAjax(recGoalService.updateStatusByIds(bo.getIds(), bo.getStatus()));
     }
 
     /**

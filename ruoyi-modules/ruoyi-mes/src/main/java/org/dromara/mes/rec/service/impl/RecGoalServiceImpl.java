@@ -159,4 +159,17 @@ public class RecGoalServiceImpl implements IRecGoalService {
         }
         return baseMapper.deleteByIds(ids) > 0;
     }
+
+    @Override
+    public Boolean updateStatusByIds(List<Long> ids, String status) {
+        LambdaUpdateWrapper<RecGoal> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.in(RecGoal::getId, ids)
+            .eq(RecGoal::getUserId, LoginHelper.getUserId())
+            .set(RecGoal::getStatus, status)
+            .set(RecGoal::getUpdateTime, new Date());
+        if ("completed".equals(status)) {
+            updateWrapper.set(RecGoal::getProgress, 100L);
+        }
+        return baseMapper.update(updateWrapper) > 0;
+    }
 }

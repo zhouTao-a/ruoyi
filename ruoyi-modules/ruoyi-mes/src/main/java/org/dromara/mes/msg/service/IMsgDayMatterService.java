@@ -91,4 +91,11 @@ public interface IMsgDayMatterService {
      * 定时更新下次提醒时间
      */
     void updateNextNotifyTime();
+
+    /**
+     * 测试：取最近一条事件发送邮件（不滚动下次通知时间）
+     *
+     * @return 发送结果说明
+     */
+    String testSendLatestMail();
 }

@@ -63,6 +63,15 @@ public class MsgDayMatterController extends BaseController {
     }
 
     /**
+     * 测试：取最近一条事件发邮件（不滚动下次通知时间）
+     */
+    @SaIgnore
+    @GetMapping("/testSendLatestMail")
+    public R<String> testSendLatestMail() {
+        return R.ok(msgDayMatterService.testSendLatestMail());
+    }
+
+    /**
      * 查询事件
      */
     @SaCheckPermission("msg:msgDayMatter:list")

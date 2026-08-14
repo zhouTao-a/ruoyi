@@ -43,6 +43,13 @@ public interface IRecReflectionService {
     List<RecReflectionVo> queryList(RecReflectionBo bo);
 
     /**
+     * 随机取一条感想（定时任务发信用，不依赖登录用户）
+     *
+     * @param userId 事件所属用户，为空则不限用户
+     */
+    RecReflectionVo pickRandom(Long userId);
+
+    /**
      * 新增感想
      *
      * @param bo 感想

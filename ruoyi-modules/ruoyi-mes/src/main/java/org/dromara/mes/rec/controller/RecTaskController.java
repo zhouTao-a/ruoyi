@@ -19,6 +19,7 @@ import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.excel.utils.ExcelUtil;
 import org.dromara.mes.rec.domain.vo.RecTaskVo;
 import org.dromara.mes.rec.domain.bo.RecTaskBo;
+import org.dromara.mes.rec.domain.bo.RecBatchStatusBo;
 import org.dromara.mes.rec.service.IRecTaskService;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 
@@ -88,6 +89,16 @@ public class RecTaskController extends BaseController {
     @PutMapping()
     public R<Void> edit(@Validated(EditGroup.class) @RequestBody RecTaskBo bo) {
         return toAjax(recTaskService.updateByBo(bo));
+    }
+
+    /**
+     * 批量修改任务状态
+     */
+    @SaCheckPermission("rec:recTask:edit")
+    @Log(title = "任务", businessType = BusinessType.UPDATE)
+    @PutMapping("/batchStatus")
+    public R<Void> batchStatus(@Validated @RequestBody RecBatchStatusBo bo) {
+        return toAjax(recTaskService.updateStatusByIds(bo.getIds(), bo.getStatus()));
     }
 
     /**

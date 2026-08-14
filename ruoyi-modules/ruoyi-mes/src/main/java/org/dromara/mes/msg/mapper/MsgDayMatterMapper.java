@@ -41,4 +41,9 @@ public interface MsgDayMatterMapper extends BaseMapperPlus<MsgDayMatter, MsgDayM
     List<MsgDayMatterNameVo> queryDayNameList(Page<Object> build,
                                               @Param("dayName") String dayName,
                                               @Param("id") String id);
+
+    /**
+     * 最近一条未删除事件（按创建时间倒序，用于试发邮件）
+     */
+    MsgDayMatterVo selectLatestOne();
 }

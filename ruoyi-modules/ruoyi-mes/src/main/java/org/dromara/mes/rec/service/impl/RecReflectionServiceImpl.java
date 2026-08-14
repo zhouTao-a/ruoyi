@@ -70,6 +70,11 @@ public class RecReflectionServiceImpl implements IRecReflectionService {
         return queryPageList(bo, new PageQuery()).getRows();
     }
 
+    @Override
+    public RecReflectionVo pickRandom(Long userId) {
+        return baseMapper.selectRandomOne(userId);
+    }
+
     /**
      * 新增感想
      *

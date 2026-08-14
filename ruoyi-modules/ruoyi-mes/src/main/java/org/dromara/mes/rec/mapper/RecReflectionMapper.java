@@ -30,6 +30,11 @@ public interface RecReflectionMapper extends BaseMapperPlus<RecReflection, RecRe
                                         @Param("param") RecReflectionBo param);
 
     /**
+     * 随机取一条未删除感想。userId 非空时限定该用户，否则不限用户。
+     */
+    RecReflectionVo selectRandomOne(@Param("userId") Long userId);
+
+    /**
      * 幻读测试 select ... for update
      */
     List<RecReflection> selectForUpdate(@Param("start") long start,
