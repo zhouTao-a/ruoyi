@@ -24,7 +24,6 @@ snail-job:
   server-port: 17888
   # 日志保存时间(单位: day)
   log-storage: 7
-  rpc-type: grpc
 
 --- # 监控中心配置
 spring.boot.admin.client:

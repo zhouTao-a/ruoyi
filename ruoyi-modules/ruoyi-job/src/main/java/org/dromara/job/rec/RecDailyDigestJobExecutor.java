@@ -1,7 +1,7 @@
 package org.dromara.job.rec;
 
 import com.aizuda.snailjob.client.job.core.annotation.JobExecutor;
-import com.aizuda.snailjob.client.model.ExecuteResult;
+import com.aizuda.snailjob.model.dto.ExecuteResult;
 import jakarta.annotation.Resource;
 import org.dromara.mes.rec.service.IRecDigestService;
 import org.springframework.stereotype.Component;
