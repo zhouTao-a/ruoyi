@@ -20,6 +20,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                  inner join mes_msg_group g on ug.group_id = g.id and g.deleted_flag = '0'
         <where>
             ug.deleted_flag = '0'
+            <if test="param.createBy != null">
+                and ug.create_by = #{param.createBy}
+            </if>
             <if test="param.id != null ">
                 and ug.id = #{param.id}
             </if>

@@ -38,9 +38,8 @@ public class RecTaskController extends BaseController {
     private final IRecTaskService recTaskService;
 
     /**
-     * 查询任务列表
+     * 查询任务列表（展示页登录即可，不校验菜单权限）
      */
-    @SaCheckPermission("rec:recTask:list")
     @GetMapping("/list")
     public TableDataInfo<RecTaskVo> list(RecTaskBo bo, PageQuery pageQuery) {
         return recTaskService.queryPageList(bo, pageQuery);

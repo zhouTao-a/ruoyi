@@ -6,7 +6,10 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.builder.MapperBuilderAssistant;
 import org.dromara.common.core.enums.FormatsType;
 import org.dromara.common.core.utils.DateUtils;
+import org.dromara.common.mybatis.core.page.PageQuery;
+import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.mes.msg.domain.MsgDayMatter;
+import org.dromara.mes.msg.domain.bo.MsgDayMatterBo;
 import org.dromara.mes.msg.domain.vo.MsgDayMatterVo;
 import org.dromara.mes.msg.domain.vo.ReminderVo;
 import org.dromara.mes.msg.enums.WhetherFlag;
@@ -15,13 +18,16 @@ import org.dromara.mes.msg.mapper.MsgMatterGroupMapper;
 import org.dromara.mes.msg.service.impl.MsgDayMatterServiceImpl;
 import org.dromara.mes.msg.support.MsgMailSender;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
@@ -54,9 +60,13 @@ public class IMsgDayMatterServiceTest {
 
     private final Page<MsgDayMatterVo> page = new Page<>();
     private final List<MsgDayMatterVo> msgDayMatterList = new ArrayList<>();
+    private MockedStatic<LoginHelper> loginHelperMock;
 
     @BeforeEach
     public void setUp() {
+        loginHelperMock = mockStatic(LoginHelper.class);
+        loginHelperMock.when(LoginHelper::getUserId).thenReturn(1L);
+
         // 初始化 MyBatis-Plus 的 TableInfo
         Configuration configuration = new Configuration();
         MapperBuilderAssistant assistant = new MapperBuilderAssistant(configuration, "");
@@ -75,8 +85,14 @@ public class IMsgDayMatterServiceTest {
 
         page.setRecords(msgDayMatterList);
         page.setTotal(msgDayMatterList.size());
-        ReflectionTestUtils.setField(msgDayMatterService, "calendarEventCache", null);
-        ReflectionTestUtils.setField(msgDayMatterService, "calendarEventCacheExpireAt", 0L);
+        ReflectionTestUtils.invokeMethod(msgDayMatterService, "invalidateCalendarEventCache");
+    }
+
+    @AfterEach
+    public void tearDown() {
+        if (loginHelperMock != null) {
+            loginHelperMock.close();
+        }
     }
 
     @Test
@@ -195,6 +211,57 @@ public class IMsgDayMatterServiceTest {
 
         assertEquals(1, result.size());
         assertEquals("2026-08-20", result.get(0).getDate());
+    }
+
+    @Test
+    @Tag("dev")
+    @DisplayName("日历列表 - 只查询当前登录人维护的事件")
+    public void dayMatterList_filtersByLoginUserCreateBy() {
+        stubMatterList(List.of(yearlySolar("生日", "2025-03-15 00:00:00", "2027-03-15 00:00:00")));
+
+        msgDayMatterService.dayMatterList(2026, 3, null);
+
+        ArgumentCaptor<MsgDayMatterBo> captor = ArgumentCaptor.forClass(MsgDayMatterBo.class);
+        verify(msgDayMatterMapper).queryPageList(any(), captor.capture());
+        assertEquals(1L, captor.getValue().getCreateBy());
+    }
+
+    @Test
+    @Tag("dev")
+    @DisplayName("管理列表 - 忽略入参 createBy，强制当前登录人")
+    public void queryPageList_overridesCreateByToLoginUser() {
+        when(msgDayMatterMapper.queryPageList(any(), any())).thenReturn(page);
+        MsgDayMatterBo bo = new MsgDayMatterBo();
+        bo.setCreateBy(999L);
+
+        msgDayMatterService.queryPageList(bo, new PageQuery());
+
+        ArgumentCaptor<MsgDayMatterBo> captor = ArgumentCaptor.forClass(MsgDayMatterBo.class);
+        verify(msgDayMatterMapper).queryPageList(any(), captor.capture());
+        assertEquals(1L, captor.getValue().getCreateBy());
+    }
+
+    @Test
+    @Tag("dev")
+    @DisplayName("日历列表 - 缓存按登录人隔离")
+    public void dayMatterList_cacheIsolatedByUser() {
+        MsgDayMatterVo user1Event = yearlySolar("用户1生日", "2025-03-15 00:00:00", "2027-03-15 00:00:00");
+        MsgDayMatterVo user2Event = yearlySolar("用户2生日", "2025-03-16 00:00:00", "2027-03-16 00:00:00");
+        user2Event.setId(3L);
+        Page<MsgDayMatterVo> page1 = new Page<>();
+        page1.setRecords(List.of(user1Event));
+        Page<MsgDayMatterVo> page2 = new Page<>();
+        page2.setRecords(List.of(user2Event));
+        when(msgDayMatterMapper.queryPageList(any(), any())).thenReturn(page1, page2);
+
+        loginHelperMock.when(LoginHelper::getUserId).thenReturn(1L);
+        List<ReminderVo> first = msgDayMatterService.dayMatterList(2026, 3, null);
+        loginHelperMock.when(LoginHelper::getUserId).thenReturn(2L);
+        List<ReminderVo> second = msgDayMatterService.dayMatterList(2026, 3, null);
+
+        assertEquals("用户1生日", first.get(0).getContent());
+        assertEquals("用户2生日", second.get(0).getContent());
+        verify(msgDayMatterMapper, times(2)).queryPageList(any(), any());
     }
 
     private MsgDayMatterVo yearlySolar(String name, String target, String nextNotify) {

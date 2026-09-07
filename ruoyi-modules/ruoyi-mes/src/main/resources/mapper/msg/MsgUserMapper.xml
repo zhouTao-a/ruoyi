@@ -10,6 +10,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         from mes_msg_user
         <where>
             deleted_flag = '0'
+            <if test="createBy != null">
+                and create_by = #{createBy}
+            </if>
             <if test="id != null ">
                 and id = #{id}
             </if>
@@ -47,6 +50,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         left join mes_msg_user s on u.spouse_id = s.id and s.deleted_flag = '0'
         <where>
             u.deleted_flag = '0'
+            <if test="param.createBy != null">
+                and u.create_by = #{param.createBy}
+            </if>
             <if test="param.id != null ">
                 and u.id = #{param.id}
             </if>

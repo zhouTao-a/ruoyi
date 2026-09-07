@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.dromara.mes.rec.mapper.RecIntrospectMapper">
+
+    <select id="queryPageList" resultType="org.dromara.mes.rec.domain.vo.RecIntrospectVo">
+        select
+            m.id,
+            m.title,
+            m.status,
+            m.sort_order as sortOrder,
+            m.user_id as userId
+        from mes_rec_introspect m
+        <where>
+            m.deleted_flag = 0
+            and m.user_id = #{param.userId}
+            <if test="param.id != null">
+                and m.id = #{param.id}
+            </if>
+            <if test="param.title != null and param.title != ''">
+                and m.title like concat('%', #{param.title}, '%')
+            </if>
+            <if test="param.status != null and param.status != ''">
+                and m.status = #{param.status}
+            </if>
+        </where>
+        order by m.status asc, m.sort_order asc, m.update_time desc
+    </select>
+
+    <select id="selectActiveByUserId" resultType="org.dromara.mes.rec.domain.vo.RecIntrospectVo">
+        select
+            m.id,
+            m.title,
+            m.status,
+            m.sort_order as sortOrder,
+            m.user_id as userId
+        from mes_rec_introspect m
+        where m.deleted_flag = 0
+          and m.user_id = #{userId}
+          and m.status = 'active'
+        order by m.update_time desc, m.id desc
+        limit 1
+    </select>
+</mapper>

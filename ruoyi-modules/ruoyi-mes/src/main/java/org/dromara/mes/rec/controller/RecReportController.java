@@ -37,9 +37,8 @@ public class RecReportController extends BaseController {
     private final IRecReportService recReportService;
 
     /**
-     * 查询报告列表
+     * 查询报告列表（展示页登录即可，不校验菜单权限）
      */
-    @SaCheckPermission("rec:recReport:list")
     @GetMapping("/list")
     public TableDataInfo<RecReportVo> list(RecReportBo bo, PageQuery pageQuery) {
         return recReportService.queryPageList(bo, pageQuery);

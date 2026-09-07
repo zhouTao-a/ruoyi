@@ -32,7 +32,6 @@ import org.dromara.system.domain.bo.SysTenantBo;
 import org.dromara.system.domain.vo.SysClientVo;
 import org.dromara.system.domain.vo.SysTenantVo;
 import org.dromara.system.service.ISysClientService;
-import org.dromara.system.service.ISysConfigService;
 import org.dromara.system.service.ISysSocialService;
 import org.dromara.system.service.ISysTenantService;
 import org.dromara.web.annotation.CheckIpWhiteList;
@@ -41,7 +40,6 @@ import org.dromara.web.domain.vo.LoginVo;
 import org.dromara.web.domain.vo.TenantListVo;
 import org.dromara.web.service.IAuthStrategy;
 import org.dromara.web.service.SysLoginService;
-import org.dromara.web.service.SysRegisterService;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -67,8 +65,6 @@ public class AuthController {
 
     private final SocialProperties socialProperties;
     private final SysLoginService loginService;
-    private final SysRegisterService registerService;
-    private final ISysConfigService configService;
     private final ISysTenantService tenantService;
     private final ISysSocialService socialUserService;
     private final ISysClientService clientService;
@@ -183,16 +179,12 @@ public class AuthController {
     }
 
     /**
-     * 用户注册
+     * 用户注册（已关闭，不允许自助注册）
      */
     @ApiEncrypt
     @PostMapping("/register")
     public R<Void> register(@Validated @RequestBody RegisterBody user) {
-        if (!configService.selectRegisterEnabled(user.getTenantId())) {
-            return R.fail("当前系统没有开启注册功能！");
-        }
-        registerService.register(user);
-        return R.ok();
+        return R.fail("当前系统没有开启注册功能！");
     }
 
     /**

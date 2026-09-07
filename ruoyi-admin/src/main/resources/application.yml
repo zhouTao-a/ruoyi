@@ -223,7 +223,7 @@ springdoc:
 msg:
   notify:
     mail-to: 987171620@qq.com
-    rec-url: http://www.allen-z.cn/rec-total
+    rec-url: http://www.allen-z.cn
     # 感想固定取该系统用户名下的记录
     reflection-username: allen
 

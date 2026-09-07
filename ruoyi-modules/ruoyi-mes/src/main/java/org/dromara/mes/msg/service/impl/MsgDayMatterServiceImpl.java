@@ -14,6 +14,7 @@ import org.dromara.mes.msg.domain.MsgMatterGroup;
 import org.dromara.mes.msg.domain.vo.*;
 import org.dromara.mes.msg.enums.WhetherFlag;
 import org.dromara.mes.msg.mapper.MsgMatterGroupMapper;
+import org.dromara.mes.msg.support.MsgMaintainerHelper;
 import org.dromara.mes.utils.LunarSolarUtils;
 import org.springframework.stereotype.Service;
 import org.dromara.mes.msg.domain.bo.MsgDayMatterBo;
@@ -32,7 +33,9 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -49,10 +52,19 @@ public class MsgDayMatterServiceImpl implements IMsgDayMatterService {
     private final MsgMatterGroupMapper msgMatterGroupMapper;
     private final MsgMailSender msgMailSender;
 
-    /** 日历全量事件短时缓存，避免翻月每次打远程库 */
+    /** 日历事件短时缓存，按维护人分桶，避免翻月打库且防止用户间串数据 */
     private static final long CALENDAR_CACHE_TTL_MS = 30_000L;
-    private volatile List<MsgDayMatterVo> calendarEventCache;
-    private volatile long calendarEventCacheExpireAt;
+    private final Map<Long, CalendarCacheEntry> calendarEventCacheByUser = new ConcurrentHashMap<>();
+
+    private static final class CalendarCacheEntry {
+        private final List<MsgDayMatterVo> events;
+        private final long expireAt;
+
+        private CalendarCacheEntry(List<MsgDayMatterVo> events, long expireAt) {
+            this.events = events;
+            this.expireAt = expireAt;
+        }
+    }
 
     /**
      * 查询事件
@@ -74,6 +86,7 @@ public class MsgDayMatterServiceImpl implements IMsgDayMatterService {
      */
     @Override
     public TableDataInfo<MsgDayMatterVo> queryPageList(MsgDayMatterBo bo, PageQuery pageQuery) {
+        MsgMaintainerHelper.apply(bo);
         Page<MsgDayMatterVo> result = baseMapper.queryPageList(pageQuery.build(), bo);
         return TableDataInfo.build(result);
     }
@@ -86,6 +99,7 @@ public class MsgDayMatterServiceImpl implements IMsgDayMatterService {
      */
     @Override
     public List<MsgDayMatterVo> queryList(MsgDayMatterBo bo) {
+        MsgMaintainerHelper.apply(bo);
         return baseMapper.queryPageList(new PageQuery().build(), bo).getRecords();
     }
 
@@ -119,6 +133,7 @@ public class MsgDayMatterServiceImpl implements IMsgDayMatterService {
         validEntityBeforeSave(bo);
         LambdaUpdateWrapper<MsgDayMatter> updateWrapper = new LambdaUpdateWrapper<>();
         updateWrapper.eq(MsgDayMatter::getId, bo.getId())
+            .eq(MsgDayMatter::getCreateBy, MsgMaintainerHelper.currentUserId())
             .set(MsgDayMatter::getDayName, bo.getDayName())
             .set(MsgDayMatter::getDayTarget, bo.getDayTarget())
             .set(MsgDayMatter::getDayLunar, bo.getDayLunar())
@@ -142,6 +157,7 @@ public class MsgDayMatterServiceImpl implements IMsgDayMatterService {
     private void validEntityBeforeSave(MsgDayMatterBo entity){
         boolean exists = baseMapper.exists(Wrappers.<MsgDayMatter>lambdaQuery()
             .eq(MsgDayMatter::getDayName, entity.getDayName())
+            .eq(MsgDayMatter::getCreateBy, MsgMaintainerHelper.currentUserId())
             .ne(entity.getId() != null, MsgDayMatter::getId, entity.getId()));
         if (exists) {
             throw new ServiceException("事件名称不能重复!");
@@ -158,7 +174,9 @@ public class MsgDayMatterServiceImpl implements IMsgDayMatterService {
      */
     @Override
     public Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid) {
-        boolean deleted = baseMapper.deleteByIds(ids) > 0;
+        boolean deleted = baseMapper.delete(Wrappers.<MsgDayMatter>lambdaQuery()
+            .in(MsgDayMatter::getId, ids)
+            .eq(MsgDayMatter::getCreateBy, MsgMaintainerHelper.currentUserId())) > 0;
         if (deleted) {
             invalidateCalendarEventCache();
         }
@@ -167,7 +185,7 @@ public class MsgDayMatterServiceImpl implements IMsgDayMatterService {
 
     @Override
     public List<MsgDayMatterNameVo> queryDayNameList(String dayName, String id, PageQuery pageQuery) {
-        return baseMapper.queryDayNameList(pageQuery.build(), dayName, id);
+        return baseMapper.queryDayNameList(pageQuery.build(), dayName, id, MsgMaintainerHelper.currentUserId());
     }
 
     @Override
@@ -181,7 +199,9 @@ public class MsgDayMatterServiceImpl implements IMsgDayMatterService {
         List<Long> filteredDayMatterIds;
         if (groupId != null) {
             List<MsgMatterGroupVo> msgMatterGroupVoList = msgMatterGroupMapper.selectVoList(
-                new LambdaQueryWrapper<MsgMatterGroup>().eq(MsgMatterGroup::getGroupId, groupId)
+                new LambdaQueryWrapper<MsgMatterGroup>()
+                    .eq(MsgMatterGroup::getGroupId, groupId)
+                    .eq(MsgMatterGroup::getCreateBy, MsgMaintainerHelper.currentUserId())
             );
             filteredDayMatterIds = msgMatterGroupVoList.stream()
                 .map(MsgMatterGroupVo::getDayMatterId)
@@ -197,31 +217,33 @@ public class MsgDayMatterServiceImpl implements IMsgDayMatterService {
     }
 
     /**
-     * 读取日历用事件全量列表，30 秒内复用，增删改会主动失效。
+     * 读取当前登录人维护的日历事件，30 秒内按用户复用，增删改会主动失效。
      */
     private List<MsgDayMatterVo> loadAllEventsForCalendar() {
+        Long userId = MsgMaintainerHelper.currentUserId();
         long now = System.currentTimeMillis();
-        List<MsgDayMatterVo> cached = calendarEventCache;
-        if (cached != null && now < calendarEventCacheExpireAt) {
-            return cached;
+        CalendarCacheEntry cached = calendarEventCacheByUser.get(userId);
+        if (cached != null && now < cached.expireAt) {
+            return cached.events;
         }
         synchronized (this) {
-            if (calendarEventCache != null && System.currentTimeMillis() < calendarEventCacheExpireAt) {
-                return calendarEventCache;
+            CalendarCacheEntry again = calendarEventCacheByUser.get(userId);
+            if (again != null && System.currentTimeMillis() < again.expireAt) {
+                return again.events;
             }
-            Page<MsgDayMatterVo> page = baseMapper.queryPageList(new PageQuery().build(), new MsgDayMatterBo());
+            MsgDayMatterBo bo = new MsgDayMatterBo();
+            MsgMaintainerHelper.apply(bo);
+            Page<MsgDayMatterVo> page = baseMapper.queryPageList(new PageQuery().build(), bo);
             List<MsgDayMatterVo> list = page == null || CollectionUtils.isEmpty(page.getRecords())
                 ? List.of()
                 : page.getRecords();
-            calendarEventCache = list;
-            calendarEventCacheExpireAt = System.currentTimeMillis() + CALENDAR_CACHE_TTL_MS;
+            calendarEventCacheByUser.put(userId, new CalendarCacheEntry(list, System.currentTimeMillis() + CALENDAR_CACHE_TTL_MS));
             return list;
         }
     }
 
     private void invalidateCalendarEventCache() {
-        calendarEventCache = null;
-        calendarEventCacheExpireAt = 0L;
+        calendarEventCacheByUser.clear();
     }
 
     /**

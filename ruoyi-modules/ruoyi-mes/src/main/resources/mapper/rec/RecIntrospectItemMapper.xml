@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.dromara.mes.rec.mapper.RecIntrospectItemMapper">
+
+    <select id="queryPageList" resultType="org.dromara.mes.rec.domain.vo.RecIntrospectItemVo">
+        select
+            i.id,
+            i.introspect_id as introspectId,
+            t.title as introspectTitle,
+            i.occur_date as occurDate,
+            i.content,
+            i.sort_order as sortOrder,
+            i.user_id as userId
+        from mes_rec_introspect_item i
+        left join mes_rec_introspect t on t.id = i.introspect_id and t.deleted_flag = 0
+        <where>
+            i.deleted_flag = 0
+            and i.user_id = #{param.userId}
+            <if test="param.id != null">
+                and i.id = #{param.id}
+            </if>
+            <if test="param.introspectId != null">
+                and i.introspect_id = #{param.introspectId}
+            </if>
+            <if test="param.occurDate != null">
+                and date(i.occur_date) = date(#{param.occurDate})
+            </if>
+            <if test="param.occurDateBegin != null">
+                and i.occur_date &gt;= #{param.occurDateBegin}
+            </if>
+            <if test="param.occurDateEnd != null">
+                and #{param.occurDateEnd} &gt; i.occur_date
+            </if>
+        </where>
+        order by i.sort_order asc, i.id asc
+    </select>
+
+    <select id="selectByUserIdAndDate" resultType="org.dromara.mes.rec.domain.vo.RecIntrospectItemVo">
+        select
+            i.id,
+            i.introspect_id as introspectId,
+            t.title as introspectTitle,
+            i.occur_date as occurDate,
+            i.content,
+            i.sort_order as sortOrder,
+            i.user_id as userId
+        from mes_rec_introspect_item i
+        left join mes_rec_introspect t on t.id = i.introspect_id and t.deleted_flag = 0
+        where i.deleted_flag = 0
+          and i.user_id = #{userId}
+          and date(i.occur_date) = date(#{occurDate})
+        order by i.sort_order asc, i.id asc
+    </select>
+</mapper>

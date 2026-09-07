@@ -6,6 +6,7 @@ import org.dromara.common.mybatis.core.page.PageQuery;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.RequiredArgsConstructor;
+import org.dromara.mes.msg.support.MsgMaintainerHelper;
 import org.springframework.stereotype.Service;
 import org.dromara.mes.msg.domain.bo.MsgDayMatterUserBo;
 import org.dromara.mes.msg.domain.vo.MsgDayMatterUserVo;
@@ -36,6 +37,10 @@ public class MsgDayMatterUserServiceImpl implements IMsgDayMatterUserService {
      */
     @Override
     public MsgDayMatterUserVo queryById(Long id){
+        MsgDayMatterUser exist = baseMapper.selectById(id);
+        if (exist == null || !MsgMaintainerHelper.isOwner(exist.getCreateBy())) {
+            return null;
+        }
         return baseMapper.selectVoById(id);
     }
 
@@ -48,6 +53,7 @@ public class MsgDayMatterUserServiceImpl implements IMsgDayMatterUserService {
      */
     @Override
     public TableDataInfo<MsgDayMatterUserVo> queryPageList(MsgDayMatterUserBo bo, PageQuery pageQuery) {
+        MsgMaintainerHelper.apply(bo);
         Page<MsgDayMatterUserVo> result = baseMapper.queryPageList(pageQuery.build(), bo);
         return TableDataInfo.build(result);
     }
@@ -60,6 +66,7 @@ public class MsgDayMatterUserServiceImpl implements IMsgDayMatterUserService {
      */
     @Override
     public List<MsgDayMatterUserVo> queryList(MsgDayMatterUserBo bo) {
+        MsgMaintainerHelper.apply(bo);
         Page<MsgDayMatterUserVo> result = baseMapper.queryPageList(new PageQuery().build(), bo);
         return result.getRecords();
     }
@@ -94,6 +101,10 @@ public class MsgDayMatterUserServiceImpl implements IMsgDayMatterUserService {
      */
     @Override
     public Boolean updateByBo(MsgDayMatterUserBo bo) {
+        MsgDayMatterUser exist = baseMapper.selectById(bo.getId());
+        if (exist == null || !MsgMaintainerHelper.isOwner(exist.getCreateBy())) {
+            throw new ServiceException("数据不存在");
+        }
         List<String> userIdList = bo.getUserIdList();
         if (!userIdList.isEmpty()) {
             for (String userId : userIdList) {
@@ -118,6 +129,7 @@ public class MsgDayMatterUserServiceImpl implements IMsgDayMatterUserService {
         return !baseMapper.exists(Wrappers.<MsgDayMatterUser>lambdaQuery()
             .eq(MsgDayMatterUser::getUserId, entity.getUserId())
             .eq(MsgDayMatterUser::getDayMatterId, entity.getDayMatterId())
+            .eq(MsgDayMatterUser::getCreateBy, MsgMaintainerHelper.currentUserId())
             .ne(entity.getId() != null, MsgDayMatterUser::getId, entity.getId()));
     }
 
@@ -130,6 +142,8 @@ public class MsgDayMatterUserServiceImpl implements IMsgDayMatterUserService {
      */
     @Override
     public Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid) {
-        return baseMapper.deleteByIds(ids) > 0;
+        return baseMapper.delete(Wrappers.<MsgDayMatterUser>lambdaQuery()
+            .in(MsgDayMatterUser::getId, ids)
+            .eq(MsgDayMatterUser::getCreateBy, MsgMaintainerHelper.currentUserId())) > 0;
     }
 }

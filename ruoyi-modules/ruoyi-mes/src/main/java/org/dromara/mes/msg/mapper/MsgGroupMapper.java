@@ -37,5 +37,6 @@ public interface MsgGroupMapper extends BaseMapperPlus<MsgGroup, MsgGroupVo> {
      */
     List<MsgGroupCodeVo> queryGroupCodePageList(Page<Object> build,
                                                 @Param("groupName") String groupName,
-                                                @Param("id") String id);
+                                                @Param("id") String id,
+                                                @Param("createBy") Long createBy);
 }

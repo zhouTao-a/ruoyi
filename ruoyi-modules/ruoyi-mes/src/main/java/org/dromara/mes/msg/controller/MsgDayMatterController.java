@@ -2,7 +2,6 @@ package org.dromara.mes.msg.controller;
 
 import java.util.List;
 
-import cn.dev33.satoken.annotation.SaIgnore;
 import lombok.RequiredArgsConstructor;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.*;
@@ -54,7 +53,9 @@ public class MsgDayMatterController extends BaseController {
     /**
      * 查询事件列表
      */
-    @SaIgnore
+    /**
+     * 日历事件：登录即可查看自己维护的数据
+     */
     @GetMapping("/dayMatterList")
     public R<List<ReminderVo>> dayMatterList(@RequestParam int year,
                                              @RequestParam int month,
@@ -65,7 +66,6 @@ public class MsgDayMatterController extends BaseController {
     /**
      * 测试：取最近一条事件发邮件（不滚动下次通知时间）
      */
-    @SaIgnore
     @GetMapping("/testSendLatestMail")
     public R<String> testSendLatestMail() {
         return R.ok(msgDayMatterService.testSendLatestMail());

@@ -39,9 +39,8 @@ public class RecGoalController extends BaseController {
     private final IRecGoalService recGoalService;
 
     /**
-     * 查询目标列表
+     * 查询目标列表（展示页登录即可，不校验菜单权限）
      */
-    @SaCheckPermission("rec:recGoal:list")
     @GetMapping(value = "/list")
     public TableDataInfo<RecGoalVo> list(RecGoalBo bo, PageQuery pageQuery) {
         return recGoalService.queryPageList(bo, pageQuery);

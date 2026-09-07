@@ -37,9 +37,8 @@ public class RecReflectionController extends BaseController {
     private final IRecReflectionService recReflectionService;
 
     /**
-     * 查询感想列表
+     * 查询感想列表（展示页登录即可，不校验菜单权限）
      */
-    @SaCheckPermission("rec:recReflection:list")
     @GetMapping("/list")
     public TableDataInfo<RecReflectionVo> list(RecReflectionBo bo, PageQuery pageQuery) {
         return recReflectionService.queryPageList(bo, pageQuery);

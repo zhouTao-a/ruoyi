@@ -27,7 +27,8 @@ public interface MsgUserMapper extends BaseMapperPlus<MsgUser, MsgUserVo> {
      */
     Page<MsgUserCodeVo> queryUserCodePageList(Page<Object> page,
                                               @Param("id") String id,
-                                              @Param("userName") String userName);
+                                              @Param("userName") String userName,
+                                              @Param("createBy") Long createBy);
 
     /**
      * 查询用户列表

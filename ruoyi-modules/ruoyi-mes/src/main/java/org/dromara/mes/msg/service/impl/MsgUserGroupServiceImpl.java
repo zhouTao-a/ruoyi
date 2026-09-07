@@ -6,6 +6,7 @@ import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
+import org.dromara.mes.msg.support.MsgMaintainerHelper;
 import org.springframework.stereotype.Service;
 import org.dromara.mes.msg.domain.bo.MsgUserGroupBo;
 import org.dromara.mes.msg.domain.vo.MsgUserGroupVo;
@@ -38,6 +39,10 @@ public class MsgUserGroupServiceImpl implements IMsgUserGroupService {
      */
     @Override
     public MsgUserGroupVo queryById(Long id){
+        MsgUserGroup exist = baseMapper.selectById(id);
+        if (exist == null || !MsgMaintainerHelper.isOwner(exist.getCreateBy())) {
+            return null;
+        }
         return baseMapper.selectVoById(id);
     }
 
@@ -50,6 +55,7 @@ public class MsgUserGroupServiceImpl implements IMsgUserGroupService {
      */
     @Override
     public TableDataInfo<MsgUserGroupVo> queryPageList(MsgUserGroupBo bo, PageQuery pageQuery) {
+        MsgMaintainerHelper.apply(bo);
         Page<MsgUserGroupVo> result = baseMapper.queryPageList(pageQuery.build(), bo);
         return TableDataInfo.build(result);
     }
@@ -62,6 +68,7 @@ public class MsgUserGroupServiceImpl implements IMsgUserGroupService {
      */
     @Override
     public List<MsgUserGroupVo> queryList(MsgUserGroupBo bo) {
+        MsgMaintainerHelper.apply(bo);
         Page<MsgUserGroupVo> result = baseMapper.queryPageList(new PageQuery().build(), bo);
         return result.getRecords();
     }
@@ -111,6 +118,7 @@ public class MsgUserGroupServiceImpl implements IMsgUserGroupService {
                 if (validEntityBeforeSave(msgUserGroup)) {
                     LambdaUpdateWrapper<MsgUserGroup> updateWrapper = new LambdaUpdateWrapper<>();
                     updateWrapper.eq(MsgUserGroup::getId, bo.getId());
+                    updateWrapper.eq(MsgUserGroup::getCreateBy, MsgMaintainerHelper.currentUserId());
                     updateWrapper.set(MsgUserGroup::getUserId, Long.parseLong(userId));
                     updateWrapper.set(MsgUserGroup::getGroupId, bo.getGroupId());
                     updateWrapper.set(MsgUserGroup::getRelativeGenerationDiff, bo.getRelativeGenerationDiff());
@@ -130,6 +138,7 @@ public class MsgUserGroupServiceImpl implements IMsgUserGroupService {
         return !baseMapper.exists(new LambdaQueryWrapper<MsgUserGroup>()
             .eq(MsgUserGroup::getUserId, entity.getUserId())
             .eq(MsgUserGroup::getGroupId, entity.getGroupId())
+            .eq(MsgUserGroup::getCreateBy, MsgMaintainerHelper.currentUserId())
             .ne(entity.getId() != null, MsgUserGroup::getId, entity.getId()));
     }
 
@@ -142,6 +151,8 @@ public class MsgUserGroupServiceImpl implements IMsgUserGroupService {
      */
     @Override
     public Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid) {
-        return baseMapper.deleteByIds(ids) > 0;
+        return baseMapper.delete(new LambdaQueryWrapper<MsgUserGroup>()
+            .in(MsgUserGroup::getId, ids)
+            .eq(MsgUserGroup::getCreateBy, MsgMaintainerHelper.currentUserId())) > 0;
     }
 }

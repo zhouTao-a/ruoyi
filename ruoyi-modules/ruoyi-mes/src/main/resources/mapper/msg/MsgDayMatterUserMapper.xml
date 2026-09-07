@@ -17,6 +17,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         left join mes_msg_user r on u.user_id = r.id and r.deleted_flag = '0'
         <where>
             u.deleted_flag = '0'
+            <if test="param.createBy != null">
+                and u.create_by = #{param.createBy}
+            </if>
             <if test="param.id != null">
                 and u.id = #{param.id}
             </if>

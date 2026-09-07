@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.dromara.mes.msg.domain.MsgGroup;
 import org.dromara.mes.msg.domain.vo.MsgGroupCodeVo;
 import org.dromara.mes.msg.domain.vo.MsgGroupVo;
+import org.dromara.mes.msg.support.MsgMaintainerHelper;
 import org.springframework.stereotype.Service;
 import org.dromara.mes.msg.domain.bo.MsgGroupBo;
 import org.dromara.mes.msg.mapper.MsgGroupMapper;
@@ -40,6 +41,10 @@ public class MsgGroupServiceImpl implements IMsgGroupService {
      */
     @Override
     public MsgGroupVo queryById(Long id){
+        MsgGroup exist = baseMapper.selectById(id);
+        if (exist == null || !MsgMaintainerHelper.isOwner(exist.getCreateBy())) {
+            return null;
+        }
         return baseMapper.selectVoById(id);
     }
 
@@ -52,6 +57,7 @@ public class MsgGroupServiceImpl implements IMsgGroupService {
      */
     @Override
     public TableDataInfo<MsgGroupVo> queryPageList(MsgGroupBo bo, PageQuery pageQuery) {
+        MsgMaintainerHelper.apply(bo);
         Page<MsgGroupVo> result = baseMapper.queryPageList(pageQuery.build(), bo);
         return TableDataInfo.build(result);
     }
@@ -65,6 +71,7 @@ public class MsgGroupServiceImpl implements IMsgGroupService {
     @Override
     public List<MsgGroupVo> queryList(MsgGroupBo bo) {
         Page<Object> build = new PageQuery().build();
+        MsgMaintainerHelper.apply(bo);
         Page<MsgGroupVo> msgGroupVoPage = baseMapper.queryPageList(build, bo);
         return msgGroupVoPage.getRecords();
     }
@@ -98,6 +105,7 @@ public class MsgGroupServiceImpl implements IMsgGroupService {
         validEntityBeforeSave(bo);
         LambdaUpdateWrapper<MsgGroup> updateWrapper = new LambdaUpdateWrapper<>();
         updateWrapper.eq(MsgGroup::getId, bo.getId())
+            .eq(MsgGroup::getCreateBy, MsgMaintainerHelper.currentUserId())
             .set(MsgGroup::getGroupName, bo.getGroupName())
             .set(MsgGroup::getGroupCode, bo.getGroupCode())
             .set(MsgGroup::getDefaultTargetUserId, bo.getDefaultTargetUserId())
@@ -111,6 +119,7 @@ public class MsgGroupServiceImpl implements IMsgGroupService {
     private void validEntityBeforeSave(MsgGroupBo entity){
         boolean exists = baseMapper.exists(Wrappers.<MsgGroup>lambdaQuery()
             .eq(MsgGroup::getGroupCode, entity.getGroupCode())
+            .eq(MsgGroup::getCreateBy, MsgMaintainerHelper.currentUserId())
             .ne(entity.getId() != null, MsgGroup::getId, entity.getId()));
         if (exists) {
             throw new ServiceException("分组代码不能重复!");
@@ -126,7 +135,9 @@ public class MsgGroupServiceImpl implements IMsgGroupService {
      */
     @Override
     public Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid) {
-        return baseMapper.deleteByIds(ids) > 0;
+        return baseMapper.delete(Wrappers.<MsgGroup>lambdaQuery()
+            .in(MsgGroup::getId, ids)
+            .eq(MsgGroup::getCreateBy, MsgMaintainerHelper.currentUserId())) > 0;
     }
 
     @Override
@@ -134,6 +145,6 @@ public class MsgGroupServiceImpl implements IMsgGroupService {
         if (id != null) {
             groupName = null;
         }
-        return baseMapper.queryGroupCodePageList(pageQuery.build(), groupName, id);
+        return baseMapper.queryGroupCodePageList(pageQuery.build(), groupName, id, MsgMaintainerHelper.currentUserId());
     }
 }

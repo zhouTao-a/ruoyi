@@ -6,6 +6,7 @@ import org.dromara.common.mybatis.core.page.PageQuery;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
+import org.dromara.mes.msg.support.MsgMaintainerHelper;
 import org.springframework.stereotype.Service;
 import org.dromara.mes.msg.domain.bo.MsgMatterGroupBo;
 import org.dromara.mes.msg.domain.vo.MsgMatterGroupVo;
@@ -37,6 +38,10 @@ public class MsgMatterGroupServiceImpl implements IMsgMatterGroupService {
      */
     @Override
     public MsgMatterGroupVo queryById(Long id){
+        MsgMatterGroup exist = baseMapper.selectById(id);
+        if (exist == null || !MsgMaintainerHelper.isOwner(exist.getCreateBy())) {
+            return null;
+        }
         return baseMapper.selectVoById(id);
     }
 
@@ -49,6 +54,7 @@ public class MsgMatterGroupServiceImpl implements IMsgMatterGroupService {
      */
     @Override
     public TableDataInfo<MsgMatterGroupVo> queryPageList(MsgMatterGroupBo bo, PageQuery pageQuery) {
+        MsgMaintainerHelper.apply(bo);
         Page<MsgMatterGroupVo> result = baseMapper.queryPageList(pageQuery.build(), bo);
         return TableDataInfo.build(result);
     }
@@ -61,6 +67,7 @@ public class MsgMatterGroupServiceImpl implements IMsgMatterGroupService {
      */
     @Override
     public List<MsgMatterGroupVo> queryList(MsgMatterGroupBo bo) {
+        MsgMaintainerHelper.apply(bo);
         Page<MsgMatterGroupVo> result = baseMapper.queryPageList(new PageQuery().build(), bo);
         return result.getRecords();
     }
@@ -99,6 +106,10 @@ public class MsgMatterGroupServiceImpl implements IMsgMatterGroupService {
      */
     @Override
     public Boolean updateByBo(MsgMatterGroupBo bo) {
+        MsgMatterGroup exist = baseMapper.selectById(bo.getId());
+        if (exist == null || !MsgMaintainerHelper.isOwner(exist.getCreateBy())) {
+            throw new ServiceException("数据不存在");
+        }
         List<String> groupIdList = bo.getGroupIdList();
         List<String> dayMatterIdList = bo.getDayMatterIdList();
         if (!groupIdList.isEmpty() && !dayMatterIdList.isEmpty()) {
@@ -126,6 +137,7 @@ public class MsgMatterGroupServiceImpl implements IMsgMatterGroupService {
         return !baseMapper.exists(new LambdaQueryWrapper<MsgMatterGroup>()
             .eq(MsgMatterGroup::getGroupId, entity.getGroupId())
             .eq(MsgMatterGroup::getDayMatterId, entity.getDayMatterId())
+            .eq(MsgMatterGroup::getCreateBy, MsgMaintainerHelper.currentUserId())
             .ne(entity.getId() != null, MsgMatterGroup::getId, entity.getId()));
     }
 
@@ -138,6 +150,8 @@ public class MsgMatterGroupServiceImpl implements IMsgMatterGroupService {
      */
     @Override
     public Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid) {
-        return baseMapper.deleteByIds(ids) > 0;
+        return baseMapper.delete(new LambdaQueryWrapper<MsgMatterGroup>()
+            .in(MsgMatterGroup::getId, ids)
+            .eq(MsgMatterGroup::getCreateBy, MsgMaintainerHelper.currentUserId())) > 0;
     }
 }
