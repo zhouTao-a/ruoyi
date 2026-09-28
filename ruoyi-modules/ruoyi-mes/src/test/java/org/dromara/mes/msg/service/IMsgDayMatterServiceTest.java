@@ -11,6 +11,7 @@ import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.mes.msg.domain.MsgDayMatter;
 import org.dromara.mes.msg.domain.bo.MsgDayMatterBo;
 import org.dromara.mes.msg.domain.vo.MsgDayMatterVo;
+import org.dromara.mes.msg.domain.vo.PhoneAlarmVo;
 import org.dromara.mes.msg.domain.vo.ReminderVo;
 import org.dromara.mes.msg.enums.WhetherFlag;
 import org.dromara.mes.msg.mapper.MsgDayMatterMapper;
@@ -262,6 +263,41 @@ public class IMsgDayMatterServiceTest {
         assertEquals("用户1生日", first.get(0).getContent());
         assertEquals("用户2生日", second.get(0).getContent());
         verify(msgDayMatterMapper, times(2)).queryPageList(any(), any());
+    }
+
+    @Test
+    @Tag("dev")
+    @DisplayName("手机闹钟只返回待通知且有下次时间的事件")
+    public void listPhoneAlarms_keepsPendingWithNextTime() {
+        Page<MsgDayMatterVo> result = new Page<>();
+        result.setRecords(List.of(
+            phoneAlarm(1L, "待通知", "pending", "2026-10-01 06:00:00"),
+            phoneAlarm(2L, "未标状态", null, "2026-10-02 15:30:00"),
+            phoneAlarm(3L, "关闭", "disabled", "2026-10-03 06:00:00"),
+            phoneAlarm(4L, "已通知", "notified", "2026-10-04 06:00:00"),
+            phoneAlarm(5L, "过期", "expired", "2026-10-05 06:00:00"),
+            phoneAlarm(6L, "没有下次时间", "pending", null)
+        ));
+        when(msgDayMatterMapper.queryPageList(any(), any())).thenReturn(result);
+
+        List<PhoneAlarmVo> list = msgDayMatterService.listPhoneAlarms();
+
+        assertEquals(2, list.size());
+        assertEquals("1", list.get(0).getId());
+        assertEquals("待通知", list.get(0).getDayName());
+        assertEquals("2", list.get(1).getId());
+    }
+
+    private MsgDayMatterVo phoneAlarm(long id, String name, String status, String next) {
+        MsgDayMatterVo vo = new MsgDayMatterVo();
+        vo.setId(id);
+        vo.setDayName(name);
+        vo.setNotifyStatus(status);
+        vo.setDayTarget(DateUtils.parseDateTime(FormatsType.YYYY_MM_DD_HH_MM_SS, "2026-10-01 00:00:00"));
+        if (next != null) {
+            vo.setNextNotifyTime(DateUtils.parseDateTime(FormatsType.YYYY_MM_DD_HH_MM_SS, next));
+        }
+        return vo;
     }
 
     private MsgDayMatterVo yearlySolar(String name, String target, String nextNotify) {

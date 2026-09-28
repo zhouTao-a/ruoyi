@@ -5,6 +5,7 @@ import org.dromara.mes.msg.domain.vo.MsgDayMatterVo;
 import org.dromara.mes.msg.domain.bo.MsgDayMatterBo;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.mybatis.core.page.PageQuery;
+import org.dromara.mes.msg.domain.vo.PhoneAlarmVo;
 import org.dromara.mes.msg.domain.vo.ReminderVo;
 
 import java.util.Collection;
@@ -86,6 +87,14 @@ public interface IMsgDayMatterService {
      * @return 事件列表
      */
     List<ReminderVo> dayMatterList(int year, int month, Long groupId);
+
+    /**
+     * 当前登录人待通知事件，供手机登记本地闹钟。
+     * 邮件发送时刻不变；无具体钟点的事件仍由手机改到上午 10 点。
+     *
+     * @return 待通知且已有下次提醒时间的事件
+     */
+    List<PhoneAlarmVo> listPhoneAlarms();
 
     /**
      * 定时更新下次提醒时间

@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.*;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import org.dromara.mes.msg.domain.vo.MsgDayMatterNameVo;
+import org.dromara.mes.msg.domain.vo.PhoneAlarmVo;
 import org.dromara.mes.msg.domain.vo.ReminderVo;
 import org.dromara.mes.system.excel.ExcelExportWrapper;
 import org.springframework.web.bind.annotation.*;
@@ -50,8 +51,8 @@ public class MsgDayMatterController extends BaseController {
 
 
 
-    /**
-     * 查询事件列表
+    /*
+      查询事件列表
      */
     /**
      * 日历事件：登录即可查看自己维护的数据
@@ -61,6 +62,14 @@ public class MsgDayMatterController extends BaseController {
                                              @RequestParam int month,
                                              @RequestParam(required = false) Long groupId) {
         return R.ok(msgDayMatterService.dayMatterList(year, month, groupId));
+    }
+
+    /**
+     * 手机闹钟数据：登录即可查看自己维护的待通知事件。
+     */
+    @GetMapping("/phoneAlarms")
+    public R<List<PhoneAlarmVo>> phoneAlarms() {
+        return R.ok(msgDayMatterService.listPhoneAlarms());
     }
 
     /**

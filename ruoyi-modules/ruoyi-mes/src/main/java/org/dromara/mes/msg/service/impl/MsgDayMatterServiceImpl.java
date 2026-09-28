@@ -217,6 +217,33 @@ public class MsgDayMatterServiceImpl implements IMsgDayMatterService {
     }
 
     /**
+     * 手机只登记待通知事件。已通知、已过期、已关闭的不返回。
+     * dayTarget 保留原始时分秒，方便客户端把 00:00:00 改到上午 10 点，不改邮件用的 06:00。
+     */
+    @Override
+    public List<PhoneAlarmVo> listPhoneAlarms() {
+        MsgDayMatterBo bo = new MsgDayMatterBo();
+        MsgMaintainerHelper.apply(bo);
+        List<MsgDayMatterVo> all = queryList(bo);
+        if (CollectionUtils.isEmpty(all)) {
+            return List.of();
+        }
+        List<PhoneAlarmVo> result = new ArrayList<>();
+        for (MsgDayMatterVo item : all) {
+            if (item.getId() == null || item.getNextNotifyTime() == null || isNotifySkipped(item.getNotifyStatus())) {
+                continue;
+            }
+            PhoneAlarmVo vo = new PhoneAlarmVo();
+            vo.setId(String.valueOf(item.getId()));
+            vo.setDayName(item.getDayName());
+            vo.setDayTarget(item.getDayTarget());
+            vo.setNextNotifyTime(item.getNextNotifyTime());
+            result.add(vo);
+        }
+        return result;
+    }
+
+    /**
      * 读取当前登录人维护的日历事件，30 秒内按用户复用，增删改会主动失效。
      */
     private List<MsgDayMatterVo> loadAllEventsForCalendar() {
