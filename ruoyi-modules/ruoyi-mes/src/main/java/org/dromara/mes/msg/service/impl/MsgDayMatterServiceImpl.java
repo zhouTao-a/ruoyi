@@ -212,6 +212,7 @@ public class MsgDayMatterServiceImpl implements IMsgDayMatterService {
 
         return msgDayMatterVoList.stream()
             .filter(item -> filteredDayMatterIds == null || filteredDayMatterIds.contains(item.getId()))
+            .filter(item -> !isNotifySkipped(item.getNotifyStatus()))
             .flatMap(item -> projectToMonth(item, year, month).stream())
             .collect(Collectors.toList());
     }
