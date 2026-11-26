@@ -94,7 +94,7 @@ public class MsgDayMatterBo extends BaseEntity {
     private Long userId;
 
     /**
-     * 按循环规则计算下次通知时间（无时刻事件落到当天 06:00）
+     * 按循环规则计算下次通知时间，时分秒沿用事件时间
      */
     public void calculateNextNotifyTime() {
         this.nextNotifyTime = NotifyTimeHelper.calculate(dayTarget, remindType, dayLunar);

@@ -19,15 +19,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class NotifyTimeHelperTest {
 
     @Test
-    @DisplayName("无时分秒的每年事件应落到未来某年当天 06:00")
-    void yearlyDateOnly_usesSixAm() {
+    @DisplayName("00:00:00 的每年事件保持 00:00:00")
+    void yearlyDateOnly_keepsMidnight() {
         Date dayTarget = DateUtils.parseDateTime(FormatsType.YYYY_MM_DD_HH_MM_SS, "2020-03-15 00:00:00");
         Date next = NotifyTimeHelper.calculate(dayTarget, "yearly", "solar");
         LocalDateTime ldt = LocalDateTime.ofInstant(next.toInstant(), ZoneId.systemDefault());
         assertEquals(15, ldt.getDayOfMonth());
         assertEquals(3, ldt.getMonthValue());
-        assertEquals(NotifyTimeHelper.DATE_ONLY_HOUR, ldt.getHour());
+        assertEquals(0, ldt.getHour());
         assertEquals(0, ldt.getMinute());
+        assertEquals(0, ldt.getSecond());
         assertTrue(ldt.isAfter(LocalDateTime.now()));
         assertTrue(ldt.toLocalDate().getYear() >= LocalDate.now().getYear());
     }
@@ -40,5 +41,17 @@ class NotifyTimeHelperTest {
         LocalDateTime ldt = LocalDateTime.ofInstant(next.toInstant(), ZoneId.systemDefault());
         assertEquals(14, ldt.getHour());
         assertEquals(30, ldt.getMinute());
+    }
+
+    @Test
+    @DisplayName("农历每年带具体时刻时保持原时分秒")
+    void lunarYearlyWithClock_keepsOriginalTime() {
+        Date dayTarget = DateUtils.parseDateTime(FormatsType.YYYY_MM_DD_HH_MM_SS, "2020-01-15 14:30:45");
+        Date next = NotifyTimeHelper.calculate(dayTarget, "yearly", "lunar");
+        LocalDateTime ldt = LocalDateTime.ofInstant(next.toInstant(), ZoneId.systemDefault());
+        assertEquals(14, ldt.getHour());
+        assertEquals(30, ldt.getMinute());
+        assertEquals(45, ldt.getSecond());
+        assertTrue(ldt.isAfter(LocalDateTime.now()));
     }
 }

@@ -219,7 +219,6 @@ public class MsgDayMatterServiceImpl implements IMsgDayMatterService {
 
     /**
      * 手机只登记待通知事件。已通知、已过期、已关闭的不返回。
-     * dayTarget 保留原始时分秒，方便客户端把 00:00:00 改到上午 10 点，不改邮件用的 06:00。
      */
     @Override
     public List<PhoneAlarmVo> listPhoneAlarms() {

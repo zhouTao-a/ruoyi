@@ -2,7 +2,6 @@ package org.dromara.mes.msg.support;
 
 import org.dromara.mes.enums.RemindTypeEnum;
 import org.dromara.mes.utils.LunarSolarUtils;
-import org.dromara.mes.utils.TimeCalculatorUtil;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -13,12 +12,9 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * 计算事件下次通知时间。无时分秒的日期型事件（生日、纪念日等）统一落到当天 06:00。
+ * 计算事件下次通知时间。时分秒沿用事件时间，00:00:00 也保持 00:00:00。
  */
 public final class NotifyTimeHelper {
-
-    /** 无具体时刻时的默认发送钟点 */
-    public static final int DATE_ONLY_HOUR = 6;
 
     private NotifyTimeHelper() {
     }
@@ -38,38 +34,27 @@ public final class NotifyTimeHelper {
         }
 
         LocalDateTime now = LocalDateTime.now();
-        boolean dateOnly = TimeCalculatorUtil.isZeroClock(dayTarget);
         LocalDateTime next;
 
         if (typeEnum == RemindTypeEnum.YEARLY && "lunar".equalsIgnoreCase(dayLunar)) {
-            next = nextLunarYearly(dayTarget, now, dateOnly);
+            next = nextLunarYearly(dayTarget, now);
         } else {
             next = toLocalDateTime(dayTarget);
-            if (dateOnly && isDatePeriod(typeEnum)) {
-                next = next.toLocalDate().atTime(DATE_ONLY_HOUR, 0);
-            }
             while (!next.isAfter(now)) {
                 next = plusPeriod(next, typeEnum);
-                if (dateOnly && isDatePeriod(typeEnum)) {
-                    next = next.toLocalDate().atTime(DATE_ONLY_HOUR, 0);
-                }
             }
         }
         return Date.from(next.atZone(ZoneId.systemDefault()).toInstant());
     }
 
-    private static boolean isDatePeriod(RemindTypeEnum typeEnum) {
-        return typeEnum == RemindTypeEnum.DAILY
-            || typeEnum == RemindTypeEnum.WEEKLY
-            || typeEnum == RemindTypeEnum.MONTHLY
-            || typeEnum == RemindTypeEnum.YEARLY;
-    }
-
-    private static LocalDateTime nextLunarYearly(Date dayTarget, LocalDateTime now, boolean dateOnly) {
+    private static LocalDateTime nextLunarYearly(Date dayTarget, LocalDateTime now) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(dayTarget);
         int lunarMonth = cal.get(Calendar.MONTH) + 1;
         int lunarDay = cal.get(Calendar.DAY_OF_MONTH);
+        int hour = cal.get(Calendar.HOUR_OF_DAY);
+        int minute = cal.get(Calendar.MINUTE);
+        int second = cal.get(Calendar.SECOND);
         int tryYear = LocalDate.now().getYear();
 
         while (true) {
@@ -80,7 +65,7 @@ public final class NotifyTimeHelper {
             Optional<LocalDateTime> future = solarDates.stream()
                 .map(LocalDate::parse)
                 .sorted()
-                .map(d -> dateOnly ? d.atTime(DATE_ONLY_HOUR, 0) : d.atStartOfDay())
+                .map(d -> d.atTime(hour, minute, second))
                 .filter(dt -> dt.isAfter(now))
                 .findFirst();
             if (future.isPresent()) {
